@@ -1,0 +1,36 @@
+<div class="contact">
+  <ul class="contact__list list-reset">
+    {% if site.data.settings.juejin %}
+      <li>
+        <a href="{{ site.data.settings.juejin }}" target="_blank">
+          <!-- <i class="ion ion-logo-twitter"></i> -->
+          <img src="{{ site.baseurl }}/images/juejin.svg">
+        </a>
+      </li>
+    {% else %} {% endif %}
+
+    {% if site.data.settings.wechat %}
+      <li>
+        <a href="{{ site.data.settings.wechat }}">
+        <!-- <i class="ion ion-logo-facebook"></i> -->
+          <img src="{{ site.baseurl }}/images/wechat.svg">
+        </a>
+      </li>
+    {% else %} {% endif %}
+  
+    {% if site.data.settings.mail %}
+      <li><a href="mailto:{{ site.data.settings.mail }}" target="_blank">
+        <!-- <i class="ion ion-logo-dribbble"></i> -->
+        <img src="{{ site.baseurl }}/images/mail.svg">
+        </a></li>
+    {% else %} {% endif %}
+  
+    <!-- {% if site.data.settings.instagram %}
+      <li><a href="{{ site.data.settings.instagram }}"><i class="ion ion-logo-instagram"></i></a></li>
+    {% else %} {% endif %}
+  
+    {% if site.data.settings.pinterest %}
+      <li><a href="{{ site.data.settings.pinterest }}"><i class="ion ion-logo-pinterest"></i></a></li>
+    {% else %} {% endif %} -->
+  </ul>
+</div>

@@ -1,0 +1,5 @@
+---
+layout: tag_page
+title: 标签
+permalink: /tag/
+---
