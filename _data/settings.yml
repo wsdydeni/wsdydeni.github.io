@@ -37,7 +37,7 @@ instagram-profile:  # Add instagram username
 
 #-------------------------------
 # Google Analytics
-google-analytics: 277991016 # Add your identifier. For example UA-99631805-1.
+# google-analytics: 277991016 # Add your identifier. For example UA-99631805-1.
 baidu-analysis: 90715077f3983fdb5f88bb73a59bb448
 
 #-------------------------------
