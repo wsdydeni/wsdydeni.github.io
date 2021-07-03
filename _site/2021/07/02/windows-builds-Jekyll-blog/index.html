@@ -9,8 +9,8 @@
   <title>Windows系统搭建Jekyll主题博客</title>
   <meta name='description' content='个人博客'>
 
-  <link rel="canonical" href="/blog/2021/07/02/windows-builds-Jekyll-blog/">
-  <link rel="alternate" type="application/rss+xml" title="" href="/blog/feed.xml">
+  <link rel="canonical" href="/2021/07/02/windows-builds-Jekyll-blog/">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
@@ -35,7 +35,7 @@
       <header class="header">
 
         <!-- <div class="logo">
-          <a class="logo__link" href="/blog/">
+          <a class="logo__link" href="/">
           
             无伤大雅的你呀
           
@@ -53,7 +53,7 @@
 
             <ul class="nav__list list-reset">
               <li class="nav__item">
-                <a href="/blog/" class="nav__link">主页</a>
+                <a href="/" class="nav__link">主页</a>
               </li>
               
                 
@@ -61,7 +61,7 @@
                 
               
               <li class="nav__item">
-                <a href="/blog/about/" class="nav__link">关于</a>
+                <a href="/about/" class="nav__link">关于</a>
               </li>
               
                 
@@ -77,7 +77,7 @@
                 
               
               <li class="nav__item">
-                <a href="/blog/tag/" class="nav__link">标签</a>
+                <a href="/tag/" class="nav__link">标签</a>
               </li>
               
                 
@@ -113,7 +113,10 @@
 
   <!-- begin content -->
   <main class="content" aria-label="Content">
-    <div class="container">
+    <!-- //添加评论系统 -->
+<link rel="stylesheet" href="/js/gitalk.css">
+<script src="/js/gitalk.min.js"></script>
+<div class="container">
   <div class="post-title-box">
     <div class="row">
       <div class="col col-10 push-2 col-11 push-t-1 col-m-12 push-m-0">
@@ -126,13 +129,13 @@
         <div class="post__info">
           <div class="post__author">
             <span>By</span>
-            <a href="/blog/about/" class="author-name">无伤大雅的你呀</a>
+            <a href="/about/" class="author-name">无伤大雅的你呀</a>
           </div>
 
           
           <div class="post__tags">
             
-              <a href="/blog/tag/其他" class="post__tags-tag">其他</a>
+              <a href="/tag/其他" class="post__tags-tag">其他</a>
             
           </div>
           
@@ -144,7 +147,7 @@
   
   
     <div class="post__head">
-      <div class="post-image" style="background-image: url(/blog/images/orange.jpg)"></div>
+      <div class="post-image" style="background-image: url(/images/orange.jpg)"></div>
     </div>
   
 
@@ -163,41 +166,41 @@
 
 <p>进入https://rubyinstaller.org/downloads/</p>
 
-<p><img src="/blog/images/image-20210702211805686.png" alt="" /></p>
+<p><img src="/images/image-20210702211805686.png" alt="" /></p>
 
 <p>点击 ==Archives== 查看历史版本</p>
 
 <p>选择 <a href="https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.5-1/rubyinstaller-devkit-2.6.5-1-x86.exe">Ruby+Devkit 2.6.5-1 (x86)</a> 版本安装</p>
 
-<p><img src="/blog/images/image-20210702212307934.png" alt="" /></p>
+<p><img src="/images/image-20210702212307934.png" alt="" /></p>
 
-<p><img src="/blog/images/image-20210702212348201.png" alt="" /></p>
+<p><img src="/images/image-20210702212348201.png" alt="" /></p>
 
 <p>勾选全部安装</p>
 
-<p><img src="/blog/images/image-20210702212656459.png" alt="" /></p>
+<p><img src="/images/image-20210702212656459.png" alt="" /></p>
 
 <p>点击Finish安装MSYS2</p>
 
-<p><img src="/blog/images/image-20210702212800356.png" alt="" /></p>
+<p><img src="/images/image-20210702212800356.png" alt="" /></p>
 
 <p>输入1按下Enter开始第一步的安装,2是可选的，1，3是必须安装的。</p>
 
-<p><img src="/blog/images/image-20210702212954661.png" alt="" /></p>
+<p><img src="/images/image-20210702212954661.png" alt="" /></p>
 
 <p>第一步安装成功,此时输入2，3都是可以的。</p>
 
-<p><img src="/blog/images/image-20210702213215717.png" alt="" /></p>
+<p><img src="/images/image-20210702213215717.png" alt="" /></p>
 
 <p>第二步失败也没事，反正是可选的，接下来输入3。</p>
 
-<p><img src="/blog/images/image-20210702213433209.png" alt="" /></p>
+<p><img src="/images/image-20210702213433209.png" alt="" /></p>
 
 <p>第三步好像也失败了，不过没事。由于老版本和墙墙的原因，失败或许难以避免。</p>
 
 <p>重新打开一个命令行窗口，输入 ==ruby -v== 和 ==gem -v== 来查看版本。</p>
 
-<p><img src="/blog/images/image-20210702213702159.png" alt="" /></p>
+<p><img src="/images/image-20210702213702159.png" alt="" /></p>
 
 <p>好像都安装成功了，那就不管那么多了。</p>
 
@@ -211,7 +214,7 @@
 
 <p>输入以上命令安装，百度了很久，这个版本比较稳。</p>
 
-<p><img src="/blog/images/image-20210702214133522.png" alt="" /></p>
+<p><img src="/images/image-20210702214133522.png" alt="" /></p>
 
 <p>貌似是安装成功了，完活。</p>
 
@@ -223,7 +226,7 @@
 
 <p>这主题啥功能都没有，就图一个首页看着顺心，后面自己折腾吧。</p>
 
-<p><img src="/blog/images/image-20210702220255271.png" alt="" /></p>
+<p><img src="/images/image-20210702220255271.png" alt="" /></p>
 
 <p>最终的效果看起来还行，生命不息，折腾不止！</p>
 
@@ -233,24 +236,24 @@
         <span class="share__title">Share this article:</span>
         <ul class="share__list list-reset">
           <li class="share__item">
-            <a class="share__facebook" href="https://www.facebook.com/sharer/sharer.php?u=/blog/2021/07/02/windows-builds-Jekyll-blog/"
+            <a class="share__facebook" href="https://www.facebook.com/sharer/sharer.php?u=/2021/07/02/windows-builds-Jekyll-blog/"
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
               title="Share on Facebook" rel="nofollow"><i class="ion ion-logo-facebook"></i></a>
           </li>
 
           <li class="share__item">
-            <a class="share__twitter" href="https://twitter.com/intent/tweet?text=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2&url=/blog/2021/07/02/windows-builds-Jekyll-blog/"
+            <a class="share__twitter" href="https://twitter.com/intent/tweet?text=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2&url=/2021/07/02/windows-builds-Jekyll-blog/"
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
               title="Share on Twitter" rel="nofollow"><i class="ion ion-logo-twitter"></i></a>
           </li>
 
           <li class="share__item">
-            <a class="share__linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=/blog/2021/07/02/windows-builds-Jekyll-blog/&title=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2&summary=&source="
+            <a class="share__linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=/2021/07/02/windows-builds-Jekyll-blog/&title=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2&summary=&source="
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn" rel="nofollow"><i class="ion ion-logo-linkedin"></i></a>
           </li>
 
           <li class="share__item">
-            <a class="share__pinterest" href="http://pinterest.com/pin/create/button/?url=/2021/07/02/windows-builds-Jekyll-blog/&amp;media=/blog/images/orange.jpg&amp;description=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2"
+            <a class="share__pinterest" href="http://pinterest.com/pin/create/button/?url=/2021/07/02/windows-builds-Jekyll-blog/&amp;media=/images/orange.jpg&amp;description=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2"
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Pinterest"
               rel="nofollow"><i class="ion ion-logo-pinterest"></i></a>
           </li>
@@ -269,7 +272,27 @@
   </div>
 
   <!--  -->
+  <!--   gitalk       -->
+
+  <div class="comment">
+    <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+    var gitalk = new Gitalk({
+        id: 'Windows系统搭建Jekyll主题博客',
+        clientID: '5ba623a6d85f6c769ba1',
+        clientSecret: 'b5a11d32fa5613e027d9463a19c49e1f0813a079',
+        repo: 'wsdydeni.github.io',
+        owner: 'wsdydeni',
+        admin: ['wsdydeni'], 
+      labels: ['Gitalk'],
+    })
+    gitalk.render('gitalk-container')
+    </script> 
   </div>
+
+</div>
 
   </main>
   <!-- end content -->
@@ -311,7 +334,7 @@
       <li>
         <a href="https://juejin.cn/user/1521379824381357/posts" target="_blank">
           <!-- <i class="ion ion-logo-twitter"></i> -->
-          <img src="/blog/images/juejin.svg">
+          <img src="/images/juejin.svg">
         </a>
       </li>
     
@@ -320,7 +343,7 @@
       <li>
         <a href="weixin://profile/gh_a9ab84416a7a">
         <!-- <i class="ion ion-logo-facebook"></i> -->
-          <img src="/blog/images/wechat.svg">
+          <img src="/images/wechat.svg">
         </a>
       </li>
     
@@ -328,7 +351,7 @@
     
       <li><a href="mailto:wsdyeniya@qq.com" target="_blank">
         <!-- <i class="ion ion-logo-dribbble"></i> -->
-        <img src="/blog/images/mail.svg">
+        <img src="/images/mail.svg">
         </a></li>
     
   
@@ -344,22 +367,22 @@
 <!-- end footer -->
 
 
-  <script src="/blog/js/vendors/jquery-3.3.1.min.js"></script>
-<script src="/blog/js/vendors/simple-jekyll-search.min.js"></script>
+  <script src="/js/vendors/jquery-3.3.1.min.js"></script>
+<script src="/js/vendors/simple-jekyll-search.min.js"></script>
 <script>
   SimpleJekyllSearch({
     searchInput: document.getElementById("js-search-input"),
     resultsContainer: document.getElementById("js-results-container"),
-    json: "/blog/search.json",
+    json: "/search.json",
     searchResultTemplate: '<li class="search-results__item"><a class="search-results__link" href="{url}">{title}</a><br> <span class="search-results__date">{date}</span></li>',
     noResultsText: '<li class="no-results">No results found</li>'
   });
 </script>
-<script src="/blog/js/vendors/transition.js"></script>
-<script src="/blog/js/vendors/zoom.min.js"></script>
-<script src="/blog/js/vendors/instafeed.min.js"></script>
-<script src="/blog/js/vendors/jquery.fitvids.js"></script>
-<script src="/blog/js/common.js"></script>
+<script src="/js/vendors/transition.js"></script>
+<script src="/js/vendors/zoom.min.js"></script>
+<script src="/js/vendors/instafeed.min.js"></script>
+<script src="/js/vendors/jquery.fitvids.js"></script>
+<script src="/js/common.js"></script>
 
 </body>
 

@@ -1,6 +1,9 @@
 ---
 layout: default
 ---
+<!-- //添加评论系统 -->
+<link rel="stylesheet" href="{{ site.baseurl }}/js/gitalk.css">
+<script src="{{ site.baseurl }}/js/gitalk.min.js"></script>
 <div class="container">
   <div class="post-title-box">
     <div class="row">
@@ -121,4 +124,24 @@ layout: default
   </div>
 
   <!-- {% if site.data.settings.disqus-identifier %} {% include disqus-comments.html %} {% endif %} -->
+  <!--   gitalk       -->
+
+  <div class="comment">
+    <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+    var gitalk = new Gitalk({
+        id: '{{ page.title }}',
+        clientID: '5ba623a6d85f6c769ba1',
+        clientSecret: 'b5a11d32fa5613e027d9463a19c49e1f0813a079',
+        repo: 'wsdydeni.github.io',
+        owner: 'wsdydeni',
+        admin: ['wsdydeni'], 
+      labels: ['Gitalk'],
+    })
+    gitalk.render('gitalk-container')
+    </script> 
   </div>
+
+</div>

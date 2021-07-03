@@ -32,3 +32,12 @@ tag_permalink_style:  pretty
 sass:
   sass_dir: _sass
   style: compressed
+
+
+gitalk:
+  enable: true
+  owner: wsdydeni
+  repo: wsdydeni.github.io
+  clientID: 5ba623a6d85f6c769ba1
+  clientSecret: b5a11d32fa5613e027d9463a19c49e1f0813a079
+  admin: wsdydeni
