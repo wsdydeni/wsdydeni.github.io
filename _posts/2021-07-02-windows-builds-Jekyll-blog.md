@@ -4,9 +4,6 @@ title:  Windows系统搭建Jekyll主题博客
 date:   2021-07-02 21:52:23 +0800
 image:  orange.jpg
 tags:   其他
-music-id: 28563314
-# description: 教你如何搭建博客
-excerpt: This is a description to make up the numbers.This is a description to make up the numbers.This is a description to make up the numbers.This is a description to make up the numbers.This is a description to make up the numbers.This is a description to make up the numbers.This is a description to make up the numbers.This is a description to make up the numbers.This is a description to make up the numbers.
 ---
 
 

@@ -6,8 +6,11 @@
 <body>
 
   {% if site.data.settings.baidu-analytics %}
-  <!-- {% include google-analytics.html %} -->
-  {% include baidu-analysis.html %}
+    {% include baidu-analysis.html %}
+  {% endif %}
+
+  {% if site.data.settings.google-analytics %}
+    {% include google-analytics.html %}
   {% endif %}
 
   {% include header.html %}
@@ -17,14 +20,6 @@
     {{ content }}
   </main>
   <!-- end content -->
-
-  <div class="music">
-    <!-- 在正文开头添加网易云音乐插件 -->
-    {% if page.music-id %}
-    {% include cloud-music.html %}
-    {% endif %} 
-  </div>
-  
   <div class="top ion ion-ios-arrow-up" title="Top">
              
   </div>
