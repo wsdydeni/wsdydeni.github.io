@@ -29,4 +29,21 @@
       right: 30px;
     }
   }
+  .music {
+    bottom: 25px;
+    &.is-active {
+      right: 40px;
+    }
+  }
+}
+
+.music {
+  position: fixed;
+  bottom: 40px;
+  // right: -400px;
+  z-index: 1;
+
+  &.is-active {
+    right: 40px;
+  }
 }

@@ -1,5 +1,5 @@
 ---
-layout: tag_page
+layout: tag
 title: 标签
 permalink: /tag/
 ---

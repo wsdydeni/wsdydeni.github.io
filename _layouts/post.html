@@ -2,8 +2,9 @@
 layout: default
 ---
 <!-- //添加评论系统 -->
-<link rel="stylesheet" href="{{ site.baseurl }}/js/gitalk.css">
-<script src="{{ site.baseurl }}/js/gitalk.min.js"></script>
+<!-- <link rel="stylesheet" href="{{ site.baseurl }}/js/gitalk.css">
+<script src="{{ site.baseurl }}/js/gitalk.min.js"></script> -->
+<link rel="stylesheet" href="{{ site.baseurl }}/js/syntax.css">
 <div class="container">
   <div class="post-title-box">
     <div class="row">
@@ -23,7 +24,7 @@ layout: default
           {% if page.tags.size >= 1 %}
           <div class="post__tags">
             {% for tag in page.tags %}
-              <a href="{{ site.baseurl }}/tag/{{ tag }}" class="post__tags-tag">{{ tag }}</a>
+              <a href="{{ site.baseurl }}/tag/#{{tag}}" class="post__tags-tag">{{ tag }}</a>
             {% endfor %}
           </div>
           {% endif %}
@@ -52,7 +53,6 @@ layout: default
       <div class="post__content">
         {{ content }}
       </div>
-
       <!-- <div class="post__share">
         <span class="share__title">Share this article:</span>
         <ul class="share__list list-reset">
@@ -124,6 +124,7 @@ layout: default
   </div>
 
   <!-- {% if site.data.settings.disqus-identifier %} {% include disqus-comments.html %} {% endif %} -->
+  
   <!--   gitalk       -->
 
   <div class="comment">

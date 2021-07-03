@@ -112,5 +112,26 @@
 // 4.4 Post
 @import '4-layouts/post';
 
-// 4.5 Tag Page
-@import '4-layouts/tag-page';
+.tag-cloud {
+    list-style: none;
+    padding: 0;
+    text-align: justify; 
+    font-size: 16px;
+    li {
+      display: inline-block;
+      margin: 0 12px 12px 0; 
+    }
+}
+
+.archive-group {
+    text-align: start;
+    padding: 20px;
+    border-top: 1px solid #ddd;
+}
+.archive-item {
+    text-align: start;
+    margin-top: 20px;
+}
+.post-tags {
+    text-align: start;
+}

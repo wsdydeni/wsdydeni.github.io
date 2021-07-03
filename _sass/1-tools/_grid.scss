@@ -32,6 +32,15 @@ $mq: ( $mobile:$columns, $tablet:$columns, $desktop:$columns );
   margin-right: ($base-spacing-unit * -1);
 }
 
+.row2 {
+  flex-wrap: wrap;
+  flex: 0 1 auto;
+  flex-direction: row;
+  box-sizing: border-box;
+  margin-left: ($base-spacing-unit * -1);
+  margin-right: ($base-spacing-unit * -1);
+}
+
 .col {
   padding-left: $base-spacing-unit;
   padding-right: $base-spacing-unit;

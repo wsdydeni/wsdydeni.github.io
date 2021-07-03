@@ -1,8 +1,8 @@
 #-------------------------------
 # General Site Settings
-title: 无伤大雅的你呀
+title: 无伤大雅的你呀的个人博客
 logo:  # You can add own logo.
-description: 个人博客
+description:
 
 
 #-------------------------------
@@ -19,6 +19,7 @@ author:
 juejin: https://juejin.cn/user/1521379824381357/posts # Add your 掘金 handle
 wechat: weixin://profile/gh_a9ab84416a7a # Add your 微信公众号 handle
 mail: wsdyeniya@qq.com # Add your 邮箱 handle
+github: https://github.com/wsdydeni # Add your github handle
 # instagram: https://instagram.com/ # Add your Instagram handle
 # pinterest: https://pinterest.com/ # Add your Pinterest handle
 
@@ -37,7 +38,7 @@ instagram-profile:  # Add instagram username
 #-------------------------------
 # Google Analytics
 google-analytics: # Add your identifier. For example UA-99631805-1.
-
+baidu-analysis: 90715077f3983fdb5f88bb73a59bb448
 
 #-------------------------------
 # Newsletter

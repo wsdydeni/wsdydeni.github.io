@@ -19,17 +19,23 @@
     {% else %} {% endif %}
   
     {% if site.data.settings.mail %}
-      <li><a href="mailto:{{ site.data.settings.mail }}" target="_blank">
+      <li>
+        <a href="mailto:{{ site.data.settings.mail }}" target="_blank">
         <!-- <i class="ion ion-logo-dribbble"></i> -->
-        <img src="{{ site.baseurl }}/images/mail.svg">
-        </a></li>
+          <img src="{{ site.baseurl }}/images/mail.svg">
+        </a>
+      </li>
     {% else %} {% endif %}
   
-    <!-- {% if site.data.settings.instagram %}
-      <li><a href="{{ site.data.settings.instagram }}"><i class="ion ion-logo-instagram"></i></a></li>
+    {% if site.data.settings.github %}
+      <li>
+        <a href="{{ site.data.settings.github }}" target="_blank">
+          <img src="{{ site.baseurl }}/images/git.svg">
+        </a>
+      </li>
     {% else %} {% endif %}
   
-    {% if site.data.settings.pinterest %}
+    <!-- {% if site.data.settings.pinterest %}
       <li><a href="{{ site.data.settings.pinterest }}"><i class="ion ion-logo-pinterest"></i></a></li>
     {% else %} {% endif %} -->
   </ul>

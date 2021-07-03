@@ -27,7 +27,7 @@
 
   .article__content {
     width: 60%;
-    padding: 50px;
+    padding: 60px;
     margin-left: -10%;
     z-index: 1;
     border-radius: 3px;
@@ -35,15 +35,15 @@
     box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 
     .article__tag {
-      font-size: 12px;
-      letter-spacing: 0.5px;
-      font-weight: 700;
+      font-size: 14px;
+      // letter-spacing: 0.5px;
+      // font-weight: 700;
       text-transform: uppercase;
     }
 
     .article__title {
-      margin-bottom: 20px;
-      font-size: 30px;
+      margin-bottom: 40px;
+      font-size: 34px;
       
       a {
         color: $dark;
@@ -54,13 +54,14 @@
     }
 
     .article__excerpt {
+      display: none;
       margin-bottom: 20px;
       font-size: 16px;
       line-height: 26px;
     }
 
     .article__meta {
-      font-size: 12px;
+      font-size: 14px;
       line-height: 18px;
       text-transform: uppercase;
       color: $gray;
@@ -73,7 +74,7 @@
       .read-more {
         margin-left: auto;
         padding-bottom: 5px;
-        font-size: 12px;
+        font-size: 14px;
         line-height: 18px;
         letter-spacing: 1px;
         text-transform: uppercase;

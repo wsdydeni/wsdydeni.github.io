@@ -3,7 +3,11 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 
 # Build settings
+highlighter: rouge
 markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
 permalink: pretty
 plugins:
   - jekyll-paginate
@@ -13,6 +17,7 @@ plugins:
 paginate: 5
 paginate_path: "/page/:num"
 
+excerpt_separator:  '<!-- more -->'
 
 # Pages Path
 defaults:
@@ -25,9 +30,9 @@ include:
   - _pages
  
 # Tags
-tag_page_dir:         tag
-tag_page_layout:      tag_page
-tag_permalink_style:  pretty
+# tag_page_dir:         tag
+# tag_page_layout:      tag_page
+# tag_permalink_style:  pretty
 
 sass:
   sass_dir: _sass
