@@ -19,4 +19,12 @@
   {% if site.data.settings.baidu-analytics %}
     {% include baidu-analysis.html %}
   {% endif %}
+
+  <style>
+    /* 这里不能删除 删除样式报错 */
+  /* {% capture include_to_scssify %}
+    {% include main.scss %}
+  {% endcapture %}
+  {{ include_to_scssify | scssify }} */
+  </style>
 </head>
