@@ -2,7 +2,7 @@
 layout: post
 title:  Android自定义View之滑块验证码
 date:   2020-07-19 22:01:03 +0800
-image:  https://image.wsdydeni.top/orange.jpg
+image:  https://image.wsdydeni.top/jarritos-mexican-soda-ap2SuhOb3K8-unsplash.jpg
 tags:   Android
 ---
 

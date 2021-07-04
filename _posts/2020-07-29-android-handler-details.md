@@ -2,7 +2,7 @@
 layout: post
 title:  浅谈Android消息机制
 date:   2020-07-29 18:21:31 +0800
-image:  https://image.wsdydeni.top/orange.jpg
+image:  https://image.wsdydeni.top/mael-balland-dOVo51t6ie4-unsplash.jpg
 tags:   Android
 ---
 

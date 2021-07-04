@@ -2,7 +2,7 @@
 layout: post
 title:   RecyclerView嵌套反向滑动问题
 date:   2021-03-03 05:24:53 +0800
-image:  https://image.wsdydeni.top/orange.jpg
+image:  https://image.wsdydeni.top/wl001002631-J8TT8zZR2PM-unsplash.jpg
 tags:   Android
 ---
 
@@ -259,8 +259,11 @@ pager.recyclerView.enforceSingleScrollDirection()
 {% endhighlight %}
 
 到这里，问题就解决完毕了。
+
 ![](https://image.wsdydeni.top/%E5%B5%8C%E5%A5%97%E6%BB%91%E5%8A%A8%E6%94%B9%E9%80%A0%E5%90%8E1.gif)
+
 ![](https://image.wsdydeni.top/%E5%B5%8C%E5%A5%97%E6%BB%91%E5%8A%A8%E6%94%B9%E9%80%A0%E5%90%8E2.gif)
+
 可以看到的是，现在的滑动行为和预期是一致的。
 
 ## 总结

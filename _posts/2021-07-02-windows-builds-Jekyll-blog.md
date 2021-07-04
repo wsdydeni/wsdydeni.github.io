@@ -2,7 +2,7 @@
 layout: post
 title:  Windows系统搭建Jekyll主题博客
 date:   2021-07-02 21:52:23 +0800
-image:  https://image.wsdydeni.top/orange.jpg
+image:  https://image.wsdydeni.top/peter-thomas-ZgU60B3Wbzs-unsplash.jpg
 tags:   博客
 ---
 

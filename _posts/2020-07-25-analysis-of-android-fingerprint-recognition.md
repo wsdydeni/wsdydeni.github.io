@@ -2,7 +2,7 @@
 layout: post
 title:  Android指纹识别浅析
 date:   2020-07-25 18:16:00 +0800
-image:  https://image.wsdydeni.top/orange.jpg
+image:  https://image.wsdydeni.top/himiway-bikes-2RVuJfhbSVU-unsplash.jpg
 tags:   Android
 ---
 
