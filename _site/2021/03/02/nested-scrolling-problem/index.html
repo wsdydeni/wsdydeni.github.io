@@ -6,10 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>标签</title>
+  <title>RecyclerView正确使用姿势</title>
   <meta name='description' content=''>
 
-  <link rel="canonical" href="/tag/">
+  <link rel="canonical" href="/2021/03/02/nested-scrolling-problem/">
   <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
 
   <!-- Fonts -->
@@ -142,75 +142,323 @@
 </div>
   <!-- begin content -->
   <main class="content" aria-label="Content">
-    <div class="container">
-  <article class="page col col-8 col-t-10 col-m-12">
-      <ul style="list-style:none;list-style-type:none;margin:0px;font-size: 14px;">
-          
-          <li style="font-size: 24px;display: inline-block;margin-right: 20px;margin-top: 20px;">
-              <a href="#Android">
-                Android
-              </a>
-          </li>
-          
-          <li style="font-size: 24px;display: inline-block;margin-right: 20px;margin-top: 20px;">
-              <a href="#博客">
-                博客
-              </a>
-          </li>
-          
-      </ul>
-  </article>
+    <!-- //添加评论系统 -->
+<!-- <link rel="stylesheet" href="/js/gitalk.css">
+<script src="/js/gitalk.min.js"></script> -->
+<link rel="stylesheet" href="/js/syntax.css">
+<div class="container">
+  <div class="post-title-box">
+    <div class="row">
+      <div class="col col-10 push-2 col-11 push-t-1 col-m-12 push-m-0">
+        <span class="post__date">
+          <time datetime="2021-03-02T05:27:36+08:00">Mar 02, 2021</time>
+        </span>
 
-  <div class="row">
-      <article class="page col col-8 col-t-10 col-m-12">
-          <div class="page__content">
-              <div id="archives">
-                  
-                      <div class="archive-group">
-                          
-                          <h4 id="#Android">Android</h3>
-                          <a name="Android"></a>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2021/03/03/nested-srcolling-problem2/">RecyclerView嵌套反向滑动问题</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2021/03/02/nested-scrolling-problem/">RecyclerView正确使用姿势</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2020/07/29/android-handler-details/">浅谈Android消息机制</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2020/07/25/analysis-of-android-fingerprint-recognition/">Android指纹识别浅析</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2020/07/19/android-custom-view-slider-verification-code/">Android自定义View之滑块验证码</a></h4>
-                          </article>
-                          
-                      </div>
-                  
-                      <div class="archive-group">
-                          
-                          <h4 id="#博客">博客</h3>
-                          <a name="博客"></a>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2021/07/02/windows-builds-Jekyll-blog/">Windows系统搭建Jekyll主题博客</a></h4>
-                          </article>
-                          
-                      </div>
-                  
-              </div>
+        <h1 class="post-title">RecyclerView正确使用姿势</h1>
+
+        <div class="post__info">
+          <div class="post__author">
+            <span>By</span>
+            <a href="/about/" class="author-name">无伤大雅的你呀</a>
           </div>
-      </article>
+
+          
+          <div class="post__tags">
+            
+              <a href="/tag/#Android" class="post__tags-tag">Android</a>
+            
+          </div>
+          
+        </div>
+      </div>
+    </div>
   </div>
+
+  
+  
+    <div class="post__head">
+      <div class="post-image" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></div>
+    </div>
+  
+
+  </div>
+
+
+  <div class="container">
+  <div class="row">
+    <!-- begin post -->
+    <article class="post  col col-8 col-t-10 col-m-12">
+
+      <div class="post__content">
+        
+<figure class="highlight"><pre><code class="language-markdown" data-lang="markdown"><span class="gt">&gt; 原文地址： [Nested recycler in Android done right!](https://medium.com/nerd-for-tech/nested-recycler-in-android-done-right-b101744e2a9a)</span>
+<span class="gt">&gt;</span>
+<span class="gt">&gt; 原文作者：[Jakub Minarik](https://jakub-minarik.medium.com/)</span>
+<span class="gt">&gt;</span>
+<span class="gt">&gt; 憨憨翻译：[无伤大雅的你呀](https://www.wsdydeni.top/about/)</span></code></pre></figure>
+
+<p>这篇文章主要讨论解决了俩个问题，外层 RecyclerView 垂直滚动时嵌套的横向 RecyclerView 滑动位置的丢失以及水平方向滑动与垂直滑动的冲突解决。</p>
+
+<p>So,Here we go !!!</p>
+
+<h3 id="构建一个示例程序">构建一个示例程序</h3>
+
+<p>中间省略一大堆翻译，就是构建了俩个适配器，直奔实现效果(直接搬原作者图了)</p>
+
+<p><img src="https://image.wsdydeni.top/ConcatAdapter.png" alt="" /></p>
+
+<p>在垂直滑动的 RecyclerView 嵌套了几个横向滑动的 RecyclerView,通过最新推出的 ConcatAdapter 加以实现。需要了解 ConcatAdapter 更多细节的可以看一下这篇文章 <a href="https://juejin.cn/post/6844904117479931912">给 Adapter 做 “加法” —— 实战 MergeAdapter</a> ,该文推出时为测试版，正式版已经更名为 ConcatAdapter ，不影响理解和使用。</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">MainActivity</span> <span class="p">:</span> <span class="nc">AppCompatActivity</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">binding</span><span class="p">:</span> <span class="nc">ActivityMainBinding</span>
+    <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">concatAdapter</span><span class="p">:</span> <span class="nc">ConcatAdapter</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">:</span> <span class="nc">Bundle</span><span class="p">?)</span> <span class="p">{</span>
+        <span class="k">super</span><span class="p">.</span><span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">)</span>
+        <span class="n">binding</span> <span class="p">=</span> <span class="nc">ActivityMainBinding</span><span class="p">.</span><span class="nf">inflate</span><span class="p">(</span><span class="n">layoutInflater</span><span class="p">)</span>
+        <span class="kd">val</span> <span class="py">view</span> <span class="p">=</span> <span class="n">binding</span><span class="p">.</span><span class="n">root</span>
+        <span class="nf">setContentView</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+        <span class="nf">initViews</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">initViews</span><span class="p">()</span> <span class="p">{</span>
+        <span class="c1">//create a populated list of sections</span>
+        <span class="kd">val</span> <span class="py">sections</span> <span class="p">=</span> <span class="nc">DataSource</span><span class="p">.</span><span class="nf">createSections</span><span class="p">(</span><span class="n">numberOfSections</span> <span class="p">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">itemsPerSection</span> <span class="p">=</span> <span class="mi">25</span><span class="p">)</span>
+
+        <span class="c1">//create an instance of ConcatAdapter</span>
+        <span class="n">concatAdapter</span> <span class="p">=</span> <span class="nc">ConcatAdapter</span><span class="p">()</span>
+
+        <span class="c1">//create AnimalSectionAdapter for the sections and add to ConcatAdapter</span>
+        <span class="kd">val</span> <span class="py">sectionAdapter</span> <span class="p">=</span> <span class="nc">AnimalSectionAdapter</span><span class="p">(</span><span class="n">sections</span><span class="p">)</span>
+        <span class="n">concatAdapter</span><span class="p">.</span><span class="nf">addAdapter</span><span class="p">(</span><span class="n">sectionAdapter</span><span class="p">)</span>
+
+        <span class="c1">//setup the recycler</span>
+        <span class="kd">val</span> <span class="py">linearLayoutManager</span> <span class="p">=</span> <span class="nc">LinearLayoutManager</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nc">VERTICAL</span><span class="p">,</span> <span class="k">false</span><span class="p">)</span>
+        <span class="n">binding</span><span class="p">.</span><span class="n">recyclerView</span><span class="p">.</span><span class="nf">run</span> <span class="p">{</span>
+            <span class="n">layoutManager</span> <span class="p">=</span> <span class="n">linearLayoutManager</span>
+            <span class="n">adapter</span> <span class="p">=</span> <span class="n">concatAdapter</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>可以简单看一下构建的过程，没什么好说的。</p>
+
+<h3 id="出现的问题">出现的问题</h3>
+
+<h4 id="滑动位置的丢失">滑动位置的丢失</h4>
+
+<p><img src="https://image.wsdydeni.top/ConcatAdapter%E5%AE%9E%E4%BE%8B.gif" alt="" /></p>
+
+<p>通过上图可以直观的看到滑动过的横向 RecyclerView 在重新显示的时候滑动位置的丢失。为了解决这个问题，分为俩步走。在回收的时候保存滑动的位置，以及重新绑定时恢复滑动的位置。</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">AnimalSectionAdapter</span><span class="p">(</span>
+<span class="c1">//...</span>
+<span class="p">)</span> <span class="p">{</span>
+	<span class="k">private</span> <span class="kd">val</span> <span class="py">scrollStates</span><span class="p">:</span> <span class="nc">MutableMap</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">,</span> <span class="nc">Parcelable</span><span class="err">?</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nf">mutableMapOf</span><span class="p">()</span>
+
+	<span class="k">private</span> <span class="k">fun</span> <span class="nf">getSectionID</span><span class="p">(</span><span class="n">position</span><span class="p">:</span> <span class="nc">Int</span><span class="p">):</span> <span class="nc">String</span> <span class="p">{</span>
+        	<span class="k">return</span> <span class="n">items</span><span class="p">[</span><span class="n">position</span><span class="p">].</span><span class="n">id</span>
+    	<span class="p">}</span>
+
+	<span class="k">override</span> <span class="k">fun</span> <span class="nf">onViewRecycled</span><span class="p">(</span><span class="n">holder</span><span class="p">:</span> <span class="nc">BaseViewHolder</span><span class="p">&lt;</span><span class="nc">AnimalSection</span><span class="p">&gt;)</span> <span class="p">{</span>
+        	<span class="k">super</span><span class="p">.</span><span class="nf">onViewRecycled</span><span class="p">(</span><span class="n">holder</span><span class="p">)</span>
+
+        	<span class="c1">//save horizontal scroll state</span>
+        	<span class="kd">val</span> <span class="py">key</span> <span class="p">=</span> <span class="nf">getSectionID</span><span class="p">(</span><span class="n">holder</span><span class="p">.</span><span class="n">layoutPosition</span><span class="p">)</span>
+        	<span class="n">scrollStates</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">=</span>
+           		<span class="n">holder</span><span class="p">.</span><span class="n">itemView</span><span class="p">.</span><span class="n">findViewById</span><span class="p">&lt;</span><span class="nc">RecyclerView</span><span class="p">&gt;(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">titledSectionRecycler</span><span class="p">).</span><span class="n">layoutManager</span><span class="o">?.</span><span class="nf">onSaveInstanceState</span><span class="p">()</span>
+    	<span class="p">}</span>
+
+    	<span class="k">override</span> <span class="k">fun</span> <span class="nf">onBindViewHolder</span><span class="p">(</span>
+   	 <span class="c1">//...</span>
+   	 <span class="p">)</span> <span class="p">{</span>
+		 <span class="c1">//restore horizontal scroll state</span>
+        	<span class="kd">val</span> <span class="py">key</span> <span class="p">=</span> <span class="nf">getSectionID</span><span class="p">(</span><span class="n">viewHolder</span><span class="p">.</span><span class="n">layoutPosition</span><span class="p">)</span>
+       		<span class="kd">val</span> <span class="py">state</span> <span class="p">=</span> <span class="n">scrollStates</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">state</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+ 			<span class="n">titledSectionRecycler</span><span class="p">.</span><span class="n">layoutManager</span><span class="o">?.</span><span class="nf">onRestoreInstanceState</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    			<span class="n">titledSectionRecycler</span><span class="p">.</span><span class="n">layoutManager</span><span class="o">?.</span><span class="nf">scrollToPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="p">}</span>
+     <span class="p">}</span>
+      <span class="c1">//...</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>在 Adapter 中创建一个 MutableMap 来持久化状态，重写 onViewRecycled 方法来保存对应的数据，key 为位置，value 为 layoutManager 调用 onSaveInstanceState() 方法后生成的序列化对象。在 onBindViewHolder 方法中，绑定时对位置进行判断，如果 state 不为空，就恢复位置，否则滑动到最前面的位置。</p>
+
+<h4 id="水平方向与垂直方向滑动的冲突解决">水平方向与垂直方向滑动的冲突解决</h4>
+
+<p>原作者直接使用了他人的解决方案，可以到原文中查看。定义了一个 RecyclerView 的扩展函数，添加了触摸和滑动的处理，从而解决了这个问题。</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="k">fun</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nf">enforceSingleScrollDirection</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">val</span> <span class="py">enforcer</span> <span class="p">=</span> <span class="nc">SingleScrollDirectionEnforcer</span><span class="p">()</span>
+    <span class="nf">addOnItemTouchListener</span><span class="p">(</span><span class="n">enforcer</span><span class="p">)</span>
+    <span class="nf">addOnScrollListener</span><span class="p">(</span><span class="n">enforcer</span><span class="p">)</span>
+<span class="p">}</span></code></pre></figure>
+
+<hr />
+
+<h3 id="其他的解决方案">其他的解决方案</h3>
+
+<h4 id="回收池">回收池</h4>
+
+<p>当外层的 RecyclerView 垂直滚动时，嵌套的横向 RecyclerView 会将视图重新加载一边，这是因为每个嵌套的 RecyclerView 拥有各自的 View Pool。可以通过给相同视图类型的 RecyclerView 设置一个共享的 View Pool,这样可以减少 View 的创建，提高了垂直方向滚动的性能。</p>
+
+<p>在这个示例项目中，显然这样做是可以的。</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">AnimalSectionAdapter</span><span class="p">(</span>
+<span class="c1">//...</span>
+<span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//create an instance of ViewPool</span>
+    <span class="k">private</span> <span class="kd">val</span> <span class="py">viewPool</span> <span class="p">=</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nc">RecycledViewPool</span><span class="p">()</span>
+
+    <span class="c1">//and set it to each nested recycler when binding</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onBindViewHolder</span><span class="p">(</span>
+    <span class="c1">//...</span>
+    <span class="p">)</span> <span class="p">{</span>
+      <span class="c1">//...</span>
+        <span class="n">titledSectionRecycler</span><span class="o">?.</span><span class="nf">run</span> <span class="p">{</span>
+            <span class="c1">//right here</span>
+            <span class="k">this</span><span class="p">.</span><span class="nf">setRecycledViewPool</span><span class="p">(</span><span class="n">viewPool</span><span class="p">)</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">layoutManager</span> <span class="p">=</span> <span class="n">layoutManager</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">adapter</span> <span class="p">=</span> <span class="nc">AnimalAdapter</span><span class="p">(</span><span class="n">item</span><span class="p">.</span><span class="n">animals</span><span class="p">)</span>
+        <span class="p">}</span>
+      <span class="c1">//...</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<h4 id="设置预加载的数量">设置预加载的数量</h4>
+
+<p>可以通过嵌套的 RecyclerView 的 LinearLayoutManager ，调用 setInitialPrefetechItemCount() 方法来预设可能会显示的可见数量。在垂直滑动的时候，外层 RecyclerView 会要求内层 RecyclerView 进行预绑定，但是内层 RecyclerView 并不知道应该预加载多少个 Item，直到该内层 RecyclerView 可见的时候，其他的非预加载 Item 才会被加载(默认情况下只有俩个 Item 会被预加载)，这样会导致性能问题。</p>
+
+<p>可以通过下面的方式来解决这个问题：</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">AnimalSectionAdapter</span><span class="p">(</span>
+<span class="c1">//...</span>
+<span class="p">)</span> <span class="p">{</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onBindViewHolder</span><span class="p">(</span>
+    <span class="c1">//... </span>
+    <span class="p">)</span> <span class="p">{</span>
+      <span class="c1">//...</span>
+      <span class="kd">val</span> <span class="py">layoutManager</span> <span class="p">=</span> <span class="nc">LinearLayoutManager</span><span class="p">(</span><span class="n">itemView</span><span class="p">.</span><span class="n">context</span><span class="p">,</span> <span class="nc">LinearLayoutManager</span><span class="p">.</span><span class="nc">HORIZONTAL</span><span class="p">,</span> <span class="k">false</span><span class="p">)</span>
+
+      <span class="c1">//right here</span>
+      <span class="n">layoutManager</span><span class="p">.</span><span class="n">initialPrefetchItemCount</span> <span class="p">=</span> <span class="mi">4</span> <span class="c1">//estimated number of visible items</span>
+      
+      <span class="kd">val</span> <span class="py">titledSectionRecycler</span> <span class="p">=</span> <span class="n">itemView</span><span class="p">.</span><span class="n">findViewById</span><span class="p">&lt;</span><span class="nc">RecyclerView</span><span class="p">&gt;(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">titledSectionRecycler</span><span class="p">)</span>
+      <span class="n">titledSectionRecycler</span><span class="o">?.</span><span class="nf">run</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">layoutManager</span> <span class="p">=</span> <span class="n">layoutManager</span>
+            <span class="c1">//...</span>
+      <span class="p">}</span>
+      <span class="c1">//...</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+      </div>
+      <!-- <div class="post__share">
+        <span class="share__title">Share this article:</span>
+        <ul class="share__list list-reset">
+          <li class="share__item">
+            <a class="share__facebook" href="https://www.facebook.com/sharer/sharer.php?u=/2021/03/02/nested-scrolling-problem/"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+              title="Share on Facebook" rel="nofollow"><i class="ion ion-logo-facebook"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__twitter" href="https://twitter.com/intent/tweet?text=RecyclerView%E6%AD%A3%E7%A1%AE%E4%BD%BF%E7%94%A8%E5%A7%BF%E5%8A%BF&url=/2021/03/02/nested-scrolling-problem/"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+              title="Share on Twitter" rel="nofollow"><i class="ion ion-logo-twitter"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=/2021/03/02/nested-scrolling-problem/&title=RecyclerView%E6%AD%A3%E7%A1%AE%E4%BD%BF%E7%94%A8%E5%A7%BF%E5%8A%BF&summary=&source="
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn" rel="nofollow"><i class="ion ion-logo-linkedin"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__pinterest" href="http://pinterest.com/pin/create/button/?url=/2021/03/02/nested-scrolling-problem/&amp;media=/images/https://image.wsdydeni.top/orange.jpg&amp;description=RecyclerView%E6%AD%A3%E7%A1%AE%E4%BD%BF%E7%94%A8%E5%A7%BF%E5%8A%BF"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Pinterest"
+              rel="nofollow"><i class="ion ion-logo-pinterest"></i></a>
+          </li>
+        </ul>
+      </div> -->
+    </article>
+    <!-- end post -->
+    </div>
+  </div>
+
+  <div class="container">
+  <div class="post__navigation">
+    
+    <div class="prev">
+      <a class="post__nav__image" href="/2020/07/29/android-handler-details/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></a>
+      <h2 class="post__nav__title">
+        <i class="ion ion-md-arrow-back"></i>
+        <a href="/2020/07/29/android-handler-details/">浅谈Android消息机制</a>
+      </h2>
+      <!-- <p class="prev__excerpt">
+        
+          概览
+
+Android 消息机制用于多线程通信
+
+进程与线程
+
+既然要讨论的是多线程通信，那么就得知道什么是线程。
+
+说到线程，必须得了解进程是什么。
+
+
+  进程是操作系统对一个正在运行的程序的一种抽象。
+
+  ...
+        
+      </p> -->
+    </div>
+    
+
+    
+    <div class="next">
+      <a class="post__nav__image" href="/2021/03/03/nested-srcolling-problem2/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)">
+      </a>
+      <h2 class="post__nav__title">
+        <a href="/2021/03/03/nested-srcolling-problem2/">RecyclerView嵌套反向滑动问题</a>
+        <i class="ion ion-md-arrow-forward"></i>
+      </h2>
+      <!-- <p class="next__excerpt">
+        
+          > - 原文地址：[Fixing RecyclerView nested scrolling in opposite direction
+>   and making ViewPager2 usable](http...
+        
+      </p> -->
+    </div>
+    
+  </div>
+
+  <!--  -->
+  
+  <!--   gitalk       -->
+
+  <div class="comment">
+    <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+    var gitalk = new Gitalk({
+        id: 'RecyclerView正确使用姿势',
+        clientID: '5ba623a6d85f6c769ba1',
+        clientSecret: 'b5a11d32fa5613e027d9463a19c49e1f0813a079',
+        repo: 'wsdydeni.github.io',
+        owner: 'wsdydeni',
+        admin: ['wsdydeni'], 
+      labels: ['Gitalk'],
+    })
+    gitalk.render('gitalk-container')
+    </script> 
+  </div>
+
 </div>
-
-
 
   </main>
   <!-- end content -->

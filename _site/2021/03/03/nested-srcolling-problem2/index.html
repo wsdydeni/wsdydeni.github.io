@@ -6,10 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Windows系统搭建Jekyll主题博客</title>
+  <title>RecyclerView嵌套反向滑动问题</title>
   <meta name='description' content=''>
 
-  <link rel="canonical" href="/2021/07/02/windows-builds-Jekyll-blog/">
+  <link rel="canonical" href="/2021/03/03/nested-srcolling-problem2/">
   <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
 
   <!-- Fonts -->
@@ -151,10 +151,10 @@
     <div class="row">
       <div class="col col-10 push-2 col-11 push-t-1 col-m-12 push-m-0">
         <span class="post__date">
-          <time datetime="2021-07-02T21:52:23+08:00">Jul 02, 2021</time>
+          <time datetime="2021-03-03T05:24:53+08:00">Mar 03, 2021</time>
         </span>
 
-        <h1 class="post-title">Windows系统搭建Jekyll主题博客</h1>
+        <h1 class="post-title">RecyclerView嵌套反向滑动问题</h1>
 
         <div class="post__info">
           <div class="post__author">
@@ -165,7 +165,7 @@
           
           <div class="post__tags">
             
-              <a href="/tag/#博客" class="post__tags-tag">博客</a>
+              <a href="/tag/#Android" class="post__tags-tag">Android</a>
             
           </div>
           
@@ -190,97 +190,286 @@
     <article class="post  col col-8 col-t-10 col-m-12">
 
       <div class="post__content">
-        <h2 id="安装-ruby">安装 Ruby</h2>
-
-<p>进入<a href="https://rubyinstaller.org/downloads/">https://rubyinstaller.org/downloads/</a></p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E4%B8%8B%E8%BD%BD%E7%95%8C%E9%9D%A2%E5%9B%BE.png" alt="" /></p>
-
-<p>点击 <code class="language-plaintext highlighter-rouge">Archives</code> 查看历史版本</p>
-
-<p>选择 <a href="https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.5-1/rubyinstaller-devkit-2.6.5-1-x86.exe"></a> 版本安装</p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B1.png" alt="" /></p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B2.png" alt="" /></p>
-
-<p>勾选全部安装</p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B3.png" alt="" /></p>
-
-<p>点击Finish安装MSYS2</p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B4.png" alt="" /></p>
-
-<p>输入1按下Enter开始第一步的安装,2是可选的，1，3是必须安装的。</p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B5.png" alt="" /></p>
-
-<p>第一步安装成功,此时输入2，3都是可以的。</p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B6.png" alt="" /></p>
-
-<p>第二步失败也没事，反正是可选的，接下来输入3。</p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B7.png" alt="" /></p>
-
-<p>第三步好像也失败了，不过没事。由于老版本和墙墙的原因，失败或许难以避免。</p>
-
-<p>重新打开一个命令行窗口，输入 <code class="language-plaintext highlighter-rouge">ruby -v</code> 和 <code class="language-plaintext highlighter-rouge">gem -v</code> 来查看版本。</p>
-
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B8.png" alt="" /></p>
-
-<p>好像都安装成功了，那就不管那么多了。</p>
+        <blockquote>
+  <ul>
+    <li>原文地址：<a href="https://bladecoder.medium.com/fixing-recyclerview-nested-scrolling-in-opposite-direction-f587be5c1a04">Fixing RecyclerView nested scrolling in opposite direction
+and making ViewPager2 usable</a></li>
+    <li>原文作者：<a href="https://bladecoder.medium.com/">Christophe Beyls</a></li>
+    <li>憨憨翻译：<a href="https://www.wsdydeni.top/">无伤大雅的你呀</a></li>
+  </ul>
+</blockquote>
 
 <hr />
 
-<h2 id="安装-jekyll">安装 Jekyll</h2>
+<p>众所周知，RecyclerView 可以通过设置 LayoutManager 的方式来选择滑动的方向，RecyclerView 还实现了 NestedScrollingChild3 接口来支持嵌套滚动，NestedScroll 机制可以让内层滚动子项拦截滚动事件，并与外层嵌套父项启动嵌套滚动。CoordinatorLayout 就是比较典型的例子，内部的 Behavior 可以监听实现了 NestedScrollingChild 接口的子 View 的滑动状态(用于实现嵌套滚动)，当然，它的功能不仅仅只有这个，还可以监听位置和尺寸的变化(折叠布局和动画效果)，这里就不做过多讨论了。</p>
 
-<p>gem 在我理解里就类似于 npm 吧，都是版本依赖管理。</p>
+<p>前不久，最新推出了 ViewPager2，不过它和 ViewPager 不同的是，内部是基于 RecyclerView 实现的，这样就会导致出现一些问题，问题的起因是 RecyclerView 并未实现 NestedScrollingParent3 接口，因此不支持内部嵌套可滚动(相同方向)的子项。不过官方提供了一个解决方案，用来支持 ViewPager2 中实现嵌套滚动。</p>
 
-<figure class="highlight"><pre><code class="language-shell" data-lang="shell">gem <span class="nb">install </span>jekyll <span class="nt">-v</span> 3.8.5</code></pre></figure>
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">NestedScrollableHost</span> <span class="p">:</span> <span class="nc">FrameLayout</span> <span class="p">{</span>
+    <span class="k">constructor</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="nc">Context</span><span class="p">)</span> <span class="p">:</span> <span class="k">super</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+    <span class="k">constructor</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="nc">Context</span><span class="p">,</span> <span class="n">attrs</span><span class="p">:</span> <span class="nc">AttributeSet</span><span class="p">?)</span> <span class="p">:</span> <span class="k">super</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
 
-<p>输入以上命令安装，百度了很久，这个版本比较稳。</p>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">touchSlop</span> <span class="p">=</span> <span class="mi">0</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">initialX</span> <span class="p">=</span> <span class="mf">0f</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">initialY</span> <span class="p">=</span> <span class="mf">0f</span>
+    <span class="k">private</span> <span class="kd">val</span> <span class="py">parentViewPager</span><span class="p">:</span> <span class="nc">ViewPager2</span><span class="p">?</span>
+        <span class="k">get</span><span class="p">()</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="py">v</span><span class="p">:</span> <span class="nc">View</span><span class="p">?</span> <span class="p">=</span> <span class="n">parent</span> <span class="k">as</span><span class="p">?</span> <span class="nc">View</span>
+            <span class="k">while</span> <span class="p">(</span><span class="n">v</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">&amp;&amp;</span> <span class="n">v</span> <span class="p">!</span><span class="k">is</span> <span class="nc">ViewPager2</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">v</span> <span class="p">=</span> <span class="n">v</span><span class="p">.</span><span class="n">parent</span> <span class="k">as</span><span class="p">?</span> <span class="nc">View</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">v</span> <span class="k">as</span><span class="p">?</span> <span class="nc">ViewPager2</span>
+        <span class="p">}</span>
 
-<p><img src="https://image.wsdydeni.top/Ruby%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B9.png" alt="" /></p>
+    <span class="k">private</span> <span class="kd">val</span> <span class="py">child</span><span class="p">:</span> <span class="nc">View</span><span class="p">?</span> <span class="k">get</span><span class="p">()</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="n">childCount</span> <span class="p">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nf">getChildAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="k">null</span>
 
-<p>貌似是安装成功了，完活。</p>
+    <span class="nf">init</span> <span class="p">{</span>
+        <span class="n">touchSlop</span> <span class="p">=</span> <span class="nc">ViewConfiguration</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="n">context</span><span class="p">).</span><span class="n">scaledTouchSlop</span>
+    <span class="p">}</span>
 
-<hr />
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">canChildScroll</span><span class="p">(</span><span class="n">orientation</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="nc">Float</span><span class="p">):</span> <span class="nc">Boolean</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">direction</span> <span class="p">=</span> <span class="p">-</span><span class="n">delta</span><span class="p">.</span><span class="n">sign</span><span class="p">.</span><span class="nf">toInt</span><span class="p">()</span>
+        <span class="k">return</span> <span class="k">when</span> <span class="p">(</span><span class="n">orientation</span><span class="p">)</span> <span class="p">{</span>
+            <span class="mi">0</span> <span class="p">-&gt;</span> <span class="n">child</span><span class="o">?.</span><span class="nf">canScrollHorizontally</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span> <span class="o">?:</span> <span class="k">false</span>
+            <span class="mi">1</span> <span class="p">-&gt;</span> <span class="n">child</span><span class="o">?.</span><span class="nf">canScrollVertically</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span> <span class="o">?:</span> <span class="k">false</span>
+            <span class="k">else</span> <span class="p">-&gt;</span> <span class="k">throw</span> <span class="nc">IllegalArgumentException</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
 
-<h2 id="搭建博客">搭建博客</h2>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onInterceptTouchEvent</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nc">MotionEvent</span><span class="p">):</span> <span class="nc">Boolean</span> <span class="p">{</span>
+        <span class="nf">handleInterceptTouchEvent</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">super</span><span class="p">.</span><span class="nf">onInterceptTouchEvent</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="p">}</span>
 
-<p>这里我选择了 <a href="https://github.com/artemsheludko/zolan">zolan</a> 主题</p>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleInterceptTouchEvent</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nc">MotionEvent</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">orientation</span> <span class="p">=</span> <span class="n">parentViewPager</span><span class="o">?.</span><span class="n">orientation</span> <span class="o">?:</span> <span class="k">return</span>
 
-<p>这主题啥功能都没有，就图一个首页看着顺心，后面自己折腾吧。</p>
+        <span class="c1">// Early return if child can't scroll in same direction as parent</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="nf">canChildScroll</span><span class="p">(</span><span class="n">orientation</span><span class="p">,</span> <span class="p">-</span><span class="mf">1f</span><span class="p">)</span> <span class="p">&amp;&amp;</span> <span class="p">!</span><span class="nf">canChildScroll</span><span class="p">(</span><span class="n">orientation</span><span class="p">,</span> <span class="mf">1f</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
 
-<p><img src="https://image.wsdydeni.top/%E5%8D%9A%E5%AE%A2%E9%A2%84%E8%A7%88%E6%95%88%E6%9E%9C%E5%9B%BE.png" alt="" /></p>
+        <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">action</span> <span class="p">==</span> <span class="nc">MotionEvent</span><span class="p">.</span><span class="nc">ACTION_DOWN</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">initialX</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">x</span>
+            <span class="n">initialY</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">y</span>
+            <span class="n">parent</span><span class="p">.</span><span class="nf">requestDisallowInterceptTouchEvent</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">action</span> <span class="p">==</span> <span class="nc">MotionEvent</span><span class="p">.</span><span class="nc">ACTION_MOVE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">val</span> <span class="py">dx</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">x</span> <span class="p">-</span> <span class="n">initialX</span>
+            <span class="kd">val</span> <span class="py">dy</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">y</span> <span class="p">-</span> <span class="n">initialY</span>
+            <span class="kd">val</span> <span class="py">isVpHorizontal</span> <span class="p">=</span> <span class="n">orientation</span> <span class="p">==</span> <span class="nc">ORIENTATION_HORIZONTAL</span>
 
-<p>最终的效果看起来还行，生命不息，折腾不止！</p>
+            <span class="c1">// assuming ViewPager2 touch-slop is 2x touch-slop of child</span>
+            <span class="kd">val</span> <span class="py">scaledDx</span> <span class="p">=</span> <span class="n">dx</span><span class="p">.</span><span class="n">absoluteValue</span> <span class="p">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">isVpHorizontal</span><span class="p">)</span> <span class="mf">.5f</span> <span class="k">else</span> <span class="mf">1f</span>
+            <span class="kd">val</span> <span class="py">scaledDy</span> <span class="p">=</span> <span class="n">dy</span><span class="p">.</span><span class="n">absoluteValue</span> <span class="p">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">isVpHorizontal</span><span class="p">)</span> <span class="mf">1f</span> <span class="k">else</span> <span class="mf">.5f</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">scaledDx</span> <span class="p">&gt;</span> <span class="n">touchSlop</span> <span class="p">||</span> <span class="n">scaledDy</span> <span class="p">&gt;</span> <span class="n">touchSlop</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">isVpHorizontal</span> <span class="p">==</span> <span class="p">(</span><span class="n">scaledDy</span> <span class="p">&gt;</span> <span class="n">scaledDx</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="c1">// Gesture is perpendicular, allow all parents to intercept</span>
+                    <span class="n">parent</span><span class="p">.</span><span class="nf">requestDisallowInterceptTouchEvent</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="c1">// Gesture is parallel, query child if movement in that direction is possible</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nf">canChildScroll</span><span class="p">(</span><span class="n">orientation</span><span class="p">,</span> <span class="k">if</span> <span class="p">(</span><span class="n">isVpHorizontal</span><span class="p">)</span> <span class="n">dx</span> <span class="k">else</span> <span class="n">dy</span><span class="p">))</span> <span class="p">{</span>
+                        <span class="c1">// Child can scroll, disallow all parents to intercept</span>
+                        <span class="n">parent</span><span class="p">.</span><span class="nf">requestDisallowInterceptTouchEvent</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+                    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                        <span class="c1">// Child cannot scroll, allow all parents to intercept</span>
+                        <span class="n">parent</span><span class="p">.</span><span class="nf">requestDisallowInterceptTouchEvent</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>上面的思路总结为，如果内部有可以水平方向滑动的子视图，那么在执行 onInterceptTouchEvent() 方法之前调用 requestDisallowInterceptTouchEvent() 来让外层不要拦截这个事件。这是翻译文章，不多扯事件机制了。</p>
+
+<h2 id="问题">问题</h2>
+
+<p>正常的逻辑思维，嵌套反方向的滚动视图，应该是开箱即用的。垂直的滚动视图不应该拦截水平方向手势，反之亦然。不过呢，ViewPager 源码里，工程师们做了滑动冲突的处理；而 ViewPager2 只考虑了水平方向的滑动。</p>
+
+<p>上面已经提了 ViewPager2 是基于 RecyclerView 实现的，那么在垂直方向的 RecyclerView 中嵌套了几个水平方向的 RecyclerView,结果可想而知。</p>
+
+<p><img src="https://image.wsdydeni.top/%E5%B5%8C%E5%A5%97%E6%BB%91%E5%8A%A8%E6%94%B9%E9%80%A0%E5%89%8D1.gif" alt="" /></p>
+
+<p>预期是水平滑动，结果是外层 RecyclerView 拦截处理了这次事件，导致的垂直滚动。为什么会产生这种情况，因为很多时候的触摸事件，并不是完全水平的手势，更多的是对角线形式的，即使是意图非常明显的水平手势(水平滑动距离大于垂直滑动距离)。用户呀，毕竟是人，不可能每次划出完美的笔直的横线。</p>
+
+<p>下面是另外一种情况，横向 ViewPager2 内部嵌套垂直滚动视图 ：</p>
+
+<p><img src="https://image.wsdydeni.top/%E5%B5%8C%E5%A5%97%E6%BB%91%E5%8A%A8%E6%94%B9%E9%80%A0%E5%89%8D2.gif" alt="" /></p>
+
+<p>不用想，外部的 ViewPager2 拦截了内部 RecylcerView 的垂直滑动事件，导致 ViewPager2 横向滑动。</p>
+
+<h2 id="原因">原因</h2>
+
+<blockquote>
+  <p>真男人是不会后退的，你让我不用 ViewPager2,重新用 ViewPager？抱歉！这是不可能的！</p>
+</blockquote>
+
+<p>问题出在哪里呢？遇事不决，量子力学！搞错了，直蹦源码。</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="c1">// RecyclerView -&gt; onInterceptTouchEvent()</span>
+
+<span class="kt">boolean</span> <span class="n">canScrollHorizontally</span> <span class="o">=</span> <span class="n">mLayout</span><span class="o">.</span><span class="na">canScrollHorizontally</span><span class="o">();</span>
+<span class="kt">boolean</span> <span class="n">canScrollVertically</span> <span class="o">=</span> <span class="n">mLayout</span><span class="o">.</span><span class="na">canScrollVertically</span><span class="o">();</span>
+<span class="k">switch</span> <span class="o">(</span><span class="n">action</span><span class="o">)</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="k">case</span> <span class="nc">MotionEvent</span><span class="o">.</span><span class="na">ACTION_MOVE</span><span class="o">:</span> <span class="o">{</span>
+        <span class="o">...</span>
+        <span class="kd">final</span> <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getX</span><span class="o">(</span><span class="n">index</span><span class="o">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="o">);</span>
+        <span class="kd">final</span> <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getY</span><span class="o">(</span><span class="n">index</span><span class="o">)</span> <span class="o">+</span> <span class="mf">0.5f</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">mScrollState</span> <span class="o">!=</span> <span class="no">SCROLL_STATE_DRAGGING</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kd">final</span> <span class="kt">int</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">mInitialTouchX</span><span class="o">;</span>
+            <span class="kd">final</span> <span class="kt">int</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">mInitialTouchY</span><span class="o">;</span>
+            <span class="kt">boolean</span> <span class="n">startScroll</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">canScrollHorizontally</span> <span class="o">&amp;&amp;</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dx</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">mTouchSlop</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">mLastTouchX</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>
+                <span class="n">startScroll</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">canScrollVertically</span> <span class="o">&amp;&amp;</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dy</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">mTouchSlop</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">mLastTouchY</span> <span class="o">=</span> <span class="n">y</span><span class="o">;</span>
+                <span class="n">startScroll</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">startScroll</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">setScrollState</span><span class="o">(</span><span class="no">SCROLL_STATE_DRAGGING</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">break</span><span class="o">;</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+<span class="k">return</span> <span class="n">mScrollState</span> <span class="o">==</span> <span class="no">SCROLL_STATE_DRAGGING</span><span class="o">;</span></code></pre></figure>
+
+<p>上面提到过 RecyclerView 是有一个确定的方向的，而且有滑动手势大多数情况为对角线方向，也就是斜的(俩个方向都有)，假设现在有俩个反方向的 RecyclerView 嵌套，滑动时，只要有一小部分滑动距离(外层 RecyclerView 相同方向的)大于可滑动的最小距离，那么外层 RecyclerView 就会拦截处理这次滑动事件。</p>
+
+<p>问题就在于，RecyclerView 单向滚动不会计算这个手势是否更接近不同方向的手势，再决定是否拦截它，这样就会导致嵌套滑动冲突。</p>
+
+<p>原文作者提出了修改方案，对单个方向的滚动进行优化。</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">canScrollHorizontally</span> <span class="o">&amp;&amp;</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dx</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">mTouchSlop</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">canScrollVertically</span> <span class="o">||</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dx</span><span class="o">)</span> <span class="o">&gt;</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dy</span><span class="o">)))</span> <span class="o">{</span>
+    <span class="n">mLastTouchX</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>
+    <span class="n">startScroll</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">canScrollVertically</span> <span class="o">&amp;&amp;</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dy</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">mTouchSlop</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">canScrollHorizontally</span> <span class="o">||</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dy</span><span class="o">)</span> <span class="o">&gt;</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">dx</span><span class="o">)))</span> <span class="o">{</span>
+    <span class="n">mLastTouchY</span> <span class="o">=</span> <span class="n">y</span><span class="o">;</span>
+    <span class="n">startScroll</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span></code></pre></figure>
+
+<h2 id="解决方案">解决方案</h2>
+
+<p>哦，我牛逼的原文作者希望上述方案，Google 工程师能够在新版源码中实现。不过我去查看了最新的版本，还是老样子。下面来讨论一下其他的可行性方案。</p>
+
+<p>显而易见的可以想到直接重写 RecyclerView的 onInterceptTouchEvent() 方法不就好了，很抱歉，里面有大量的私有字段，所以必须要调用 super.onInterceptTouchEvent() 方法，并在这个语句后，添加一些其他操作，对逻辑进行调整。ViewPager2 也是 final 类，是不可以通过继承的方式修改使用的，事实证明，这个方案是不切实际的。</p>
+
+<p>可以通过实现 OnItemTouchListener 和 OnScrollListener 俩个接口的方式，来实现想要的效果：</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="k">fun</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nf">enforceSingleScrollDirection</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">val</span> <span class="py">enforcer</span> <span class="p">=</span> <span class="nc">SingleScrollDirectionEnforcer</span><span class="p">()</span>
+    <span class="nf">addOnItemTouchListener</span><span class="p">(</span><span class="n">enforcer</span><span class="p">)</span>
+    <span class="nf">addOnScrollListener</span><span class="p">(</span><span class="n">enforcer</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">private</span> <span class="kd">class</span> <span class="nc">SingleScrollDirectionEnforcer</span> <span class="p">:</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nc">OnScrollListener</span><span class="p">(),</span> <span class="nc">OnItemTouchListener</span> <span class="p">{</span>
+
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">scrollState</span> <span class="p">=</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nc">SCROLL_STATE_IDLE</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">scrollPointerId</span> <span class="p">=</span> <span class="p">-</span><span class="mi">1</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">initialTouchX</span> <span class="p">=</span> <span class="mi">0</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">initialTouchY</span> <span class="p">=</span> <span class="mi">0</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">dx</span> <span class="p">=</span> <span class="mi">0</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">dy</span> <span class="p">=</span> <span class="mi">0</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onInterceptTouchEvent</span><span class="p">(</span><span class="n">rv</span><span class="p">:</span> <span class="nc">RecyclerView</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="nc">MotionEvent</span><span class="p">):</span> <span class="nc">Boolean</span> <span class="p">{</span>
+        <span class="k">when</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">actionMasked</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nc">MotionEvent</span><span class="p">.</span><span class="nc">ACTION_DOWN</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">scrollPointerId</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="nf">getPointerId</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">initialTouchX</span> <span class="p">=</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">x</span> <span class="p">+</span> <span class="mf">0.5f</span><span class="p">).</span><span class="nf">toInt</span><span class="p">()</span>
+                <span class="n">initialTouchY</span> <span class="p">=</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">y</span> <span class="p">+</span> <span class="mf">0.5f</span><span class="p">).</span><span class="nf">toInt</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="nc">MotionEvent</span><span class="p">.</span><span class="nc">ACTION_POINTER_DOWN</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="kd">val</span> <span class="py">actionIndex</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">actionIndex</span>
+                <span class="n">scrollPointerId</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="nf">getPointerId</span><span class="p">(</span><span class="n">actionIndex</span><span class="p">)</span>
+                <span class="n">initialTouchX</span> <span class="p">=</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="nf">getX</span><span class="p">(</span><span class="n">actionIndex</span><span class="p">)</span> <span class="p">+</span> <span class="mf">0.5f</span><span class="p">).</span><span class="nf">toInt</span><span class="p">()</span>
+                <span class="n">initialTouchY</span> <span class="p">=</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="nf">getY</span><span class="p">(</span><span class="n">actionIndex</span><span class="p">)</span> <span class="p">+</span> <span class="mf">0.5f</span><span class="p">).</span><span class="nf">toInt</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="nc">MotionEvent</span><span class="p">.</span><span class="nc">ACTION_MOVE</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="kd">val</span> <span class="py">index</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="nf">findPointerIndex</span><span class="p">(</span><span class="n">scrollPointerId</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="p">&gt;=</span> <span class="mi">0</span> <span class="p">&amp;&amp;</span> <span class="n">scrollState</span> <span class="p">!=</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nc">SCROLL_STATE_DRAGGING</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">val</span> <span class="py">x</span> <span class="p">=</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="nf">getX</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="p">+</span> <span class="mf">0.5f</span><span class="p">).</span><span class="nf">toInt</span><span class="p">()</span>
+                    <span class="kd">val</span> <span class="py">y</span> <span class="p">=</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="nf">getY</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="p">+</span> <span class="mf">0.5f</span><span class="p">).</span><span class="nf">toInt</span><span class="p">()</span>
+                    <span class="n">dx</span> <span class="p">=</span> <span class="n">x</span> <span class="p">-</span> <span class="n">initialTouchX</span>
+                    <span class="n">dy</span> <span class="p">=</span> <span class="n">y</span> <span class="p">-</span> <span class="n">initialTouchY</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="k">false</span>
+    <span class="p">}</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onTouchEvent</span><span class="p">(</span><span class="n">rv</span><span class="p">:</span> <span class="nc">RecyclerView</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="nc">MotionEvent</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onRequestDisallowInterceptTouchEvent</span><span class="p">(</span><span class="n">disallowIntercept</span><span class="p">:</span> <span class="nc">Boolean</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onScrollStateChanged</span><span class="p">(</span><span class="n">recyclerView</span><span class="p">:</span> <span class="nc">RecyclerView</span><span class="p">,</span> <span class="n">newState</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">oldState</span> <span class="p">=</span> <span class="n">scrollState</span>
+        <span class="n">scrollState</span> <span class="p">=</span> <span class="n">newState</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">oldState</span> <span class="p">==</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nc">SCROLL_STATE_IDLE</span> <span class="p">&amp;&amp;</span> <span class="n">newState</span> <span class="p">==</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="nc">SCROLL_STATE_DRAGGING</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">recyclerView</span><span class="p">.</span><span class="n">layoutManager</span><span class="o">?.</span><span class="nf">let</span> <span class="p">{</span> <span class="n">layoutManager</span> <span class="p">-&gt;</span>
+                <span class="kd">val</span> <span class="py">canScrollHorizontally</span> <span class="p">=</span> <span class="n">layoutManager</span><span class="p">.</span><span class="nf">canScrollHorizontally</span><span class="p">()</span>
+                <span class="kd">val</span> <span class="py">canScrollVertically</span> <span class="p">=</span> <span class="n">layoutManager</span><span class="p">.</span><span class="nf">canScrollVertically</span><span class="p">()</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">canScrollHorizontally</span> <span class="p">!=</span> <span class="n">canScrollVertically</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">canScrollHorizontally</span> <span class="p">&amp;&amp;</span> <span class="nf">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span> <span class="p">&gt;</span> <span class="nf">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">))</span>
+                            <span class="p">||</span> <span class="p">(</span><span class="n">canScrollVertically</span> <span class="p">&amp;&amp;</span> <span class="nf">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="p">&gt;</span> <span class="nf">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">)))</span> <span class="p">{</span>
+                        <span class="n">recyclerView</span><span class="p">.</span><span class="nf">stopScroll</span><span class="p">()</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>重写 OnItemTouchListener 的 onInterceptTouchEvent 方法，逻辑不变，返回 false 即可，目的是不要拦截事件；重写 OnScrollListener 的 onScrollStateChanged 方法，在静止状态向拖动状态转变时，如果与 RecyclerView 反向的滑动距离大于同方向的距离，停止滑动。</p>
+
+<p>对于 ViewPager2 来说，先获取内部的 RecyclerView，再采用上述方案即可。</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">val</span> <span class="py">ViewPager2</span><span class="p">.</span><span class="n">recyclerView</span><span class="p">:</span> <span class="nc">RecyclerView</span>
+    <span class="k">get</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">as</span> <span class="nc">RecyclerView</span>
+    <span class="p">}</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">val</span> <span class="py">pager</span><span class="p">:</span> <span class="nc">ViewPager2</span> <span class="p">=</span> <span class="nf">findViewById</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">pager</span><span class="p">)</span>
+<span class="n">pager</span><span class="p">.</span><span class="n">recyclerView</span><span class="p">.</span><span class="nf">enforceSingleScrollDirection</span><span class="p">()</span></code></pre></figure>
+
+<p>到这里，问题就解决完毕了。
+<img src="https://image.wsdydeni.top/%E5%B5%8C%E5%A5%97%E6%BB%91%E5%8A%A8%E6%94%B9%E9%80%A0%E5%90%8E1.gif" alt="" />
+<img src="https://image.wsdydeni.top/%E5%B5%8C%E5%A5%97%E6%BB%91%E5%8A%A8%E6%94%B9%E9%80%A0%E5%90%8E2.gif" alt="" />
+可以看到的是，现在的滑动行为和预期是一致的。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>嵌套滑动问题是不可避免的，这里提供了一个临时可解决方案。</p>
+
+<p>感谢各位的阅读，欢迎交流学习。</p>
 
       </div>
       <!-- <div class="post__share">
         <span class="share__title">Share this article:</span>
         <ul class="share__list list-reset">
           <li class="share__item">
-            <a class="share__facebook" href="https://www.facebook.com/sharer/sharer.php?u=/2021/07/02/windows-builds-Jekyll-blog/"
+            <a class="share__facebook" href="https://www.facebook.com/sharer/sharer.php?u=/2021/03/03/nested-srcolling-problem2/"
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
               title="Share on Facebook" rel="nofollow"><i class="ion ion-logo-facebook"></i></a>
           </li>
 
           <li class="share__item">
-            <a class="share__twitter" href="https://twitter.com/intent/tweet?text=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2&url=/2021/07/02/windows-builds-Jekyll-blog/"
+            <a class="share__twitter" href="https://twitter.com/intent/tweet?text=RecyclerView%E5%B5%8C%E5%A5%97%E5%8F%8D%E5%90%91%E6%BB%91%E5%8A%A8%E9%97%AE%E9%A2%98&url=/2021/03/03/nested-srcolling-problem2/"
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
               title="Share on Twitter" rel="nofollow"><i class="ion ion-logo-twitter"></i></a>
           </li>
 
           <li class="share__item">
-            <a class="share__linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=/2021/07/02/windows-builds-Jekyll-blog/&title=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2&summary=&source="
+            <a class="share__linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=/2021/03/03/nested-srcolling-problem2/&title=RecyclerView%E5%B5%8C%E5%A5%97%E5%8F%8D%E5%90%91%E6%BB%91%E5%8A%A8%E9%97%AE%E9%A2%98&summary=&source="
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn" rel="nofollow"><i class="ion ion-logo-linkedin"></i></a>
           </li>
 
           <li class="share__item">
-            <a class="share__pinterest" href="http://pinterest.com/pin/create/button/?url=/2021/07/02/windows-builds-Jekyll-blog/&amp;media=/images/https://image.wsdydeni.top/orange.jpg&amp;description=Windows%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BAJekyll%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2"
+            <a class="share__pinterest" href="http://pinterest.com/pin/create/button/?url=/2021/03/03/nested-srcolling-problem2/&amp;media=/images/https://image.wsdydeni.top/orange.jpg&amp;description=RecyclerView%E5%B5%8C%E5%A5%97%E5%8F%8D%E5%90%91%E6%BB%91%E5%8A%A8%E9%97%AE%E9%A2%98"
               onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Pinterest"
               rel="nofollow"><i class="ion ion-logo-pinterest"></i></a>
           </li>
@@ -295,23 +484,38 @@
   <div class="post__navigation">
     
     <div class="prev">
-      <a class="post__nav__image" href="/2021/03/03/nested-srcolling-problem2/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></a>
+      <a class="post__nav__image" href="/2021/03/02/nested-scrolling-problem/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></a>
       <h2 class="post__nav__title">
         <i class="ion ion-md-arrow-back"></i>
-        <a href="/2021/03/03/nested-srcolling-problem2/">RecyclerView嵌套反向滑动问题</a>
+        <a href="/2021/03/02/nested-scrolling-problem/">RecyclerView正确使用姿势</a>
       </h2>
       <!-- <p class="prev__excerpt">
         
           
-  
-    原文地址：Fixing RecyclerView nested scrolling in opposite direction
-and making ViewPager2 usable
-    原文...
+&gt; 原文地址： [Nested recycler in Android done right!](https://medium.com/nerd-for-tech/nested-recycler-in-an...
         
       </p> -->
     </div>
     
 
+    
+    <div class="next">
+      <a class="post__nav__image" href="/2021/07/02/windows-builds-Jekyll-blog/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)">
+      </a>
+      <h2 class="post__nav__title">
+        <a href="/2021/07/02/windows-builds-Jekyll-blog/">Windows系统搭建Jekyll主题博客</a>
+        <i class="ion ion-md-arrow-forward"></i>
+      </h2>
+      <!-- <p class="next__excerpt">
+        
+          ## 安装 Ruby
+
+进入[https://rubyinstaller.org/downloads/](https://rubyinstaller.org/downloads/)
+
+![](https://ima...
+        
+      </p> -->
+    </div>
     
   </div>
 
@@ -325,7 +529,7 @@ and making ViewPager2 usable
     <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
     <script>
     var gitalk = new Gitalk({
-        id: 'Windows系统搭建Jekyll主题博客',
+        id: 'RecyclerView嵌套反向滑动问题',
         clientID: '5ba623a6d85f6c769ba1',
         clientSecret: 'b5a11d32fa5613e027d9463a19c49e1f0813a079',
         repo: 'wsdydeni.github.io',

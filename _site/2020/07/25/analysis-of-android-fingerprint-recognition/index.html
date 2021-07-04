@@ -6,10 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>标签</title>
+  <title>Android指纹识别浅析</title>
   <meta name='description' content=''>
 
-  <link rel="canonical" href="/tag/">
+  <link rel="canonical" href="/2020/07/25/analysis-of-android-fingerprint-recognition/">
   <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
 
   <!-- Fonts -->
@@ -142,75 +142,427 @@
 </div>
   <!-- begin content -->
   <main class="content" aria-label="Content">
-    <div class="container">
-  <article class="page col col-8 col-t-10 col-m-12">
-      <ul style="list-style:none;list-style-type:none;margin:0px;font-size: 14px;">
-          
-          <li style="font-size: 24px;display: inline-block;margin-right: 20px;margin-top: 20px;">
-              <a href="#Android">
-                Android
-              </a>
-          </li>
-          
-          <li style="font-size: 24px;display: inline-block;margin-right: 20px;margin-top: 20px;">
-              <a href="#博客">
-                博客
-              </a>
-          </li>
-          
-      </ul>
-  </article>
+    <!-- //添加评论系统 -->
+<!-- <link rel="stylesheet" href="/js/gitalk.css">
+<script src="/js/gitalk.min.js"></script> -->
+<link rel="stylesheet" href="/js/syntax.css">
+<div class="container">
+  <div class="post-title-box">
+    <div class="row">
+      <div class="col col-10 push-2 col-11 push-t-1 col-m-12 push-m-0">
+        <span class="post__date">
+          <time datetime="2020-07-25T18:16:00+08:00">Jul 25, 2020</time>
+        </span>
 
-  <div class="row">
-      <article class="page col col-8 col-t-10 col-m-12">
-          <div class="page__content">
-              <div id="archives">
-                  
-                      <div class="archive-group">
-                          
-                          <h4 id="#Android">Android</h3>
-                          <a name="Android"></a>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2021/03/03/nested-srcolling-problem2/">RecyclerView嵌套反向滑动问题</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2021/03/02/nested-scrolling-problem/">RecyclerView正确使用姿势</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2020/07/29/android-handler-details/">浅谈Android消息机制</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2020/07/25/analysis-of-android-fingerprint-recognition/">Android指纹识别浅析</a></h4>
-                          </article>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2020/07/19/android-custom-view-slider-verification-code/">Android自定义View之滑块验证码</a></h4>
-                          </article>
-                          
-                      </div>
-                  
-                      <div class="archive-group">
-                          
-                          <h4 id="#博客">博客</h3>
-                          <a name="博客"></a>
-                          
-                          <article class="archive-item">
-                              <h5><a href="/2021/07/02/windows-builds-Jekyll-blog/">Windows系统搭建Jekyll主题博客</a></h4>
-                          </article>
-                          
-                      </div>
-                  
-              </div>
+        <h1 class="post-title">Android指纹识别浅析</h1>
+
+        <div class="post__info">
+          <div class="post__author">
+            <span>By</span>
+            <a href="/about/" class="author-name">无伤大雅的你呀</a>
           </div>
-      </article>
+
+          
+          <div class="post__tags">
+            
+              <a href="/tag/#Android" class="post__tags-tag">Android</a>
+            
+          </div>
+          
+        </div>
+      </div>
+    </div>
   </div>
+
+  
+  
+    <div class="post__head">
+      <div class="post-image" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></div>
+    </div>
+  
+
+  </div>
+
+
+  <div class="container">
+  <div class="row">
+    <!-- begin post -->
+    <article class="post  col col-8 col-t-10 col-m-12">
+
+      <div class="post__content">
+        <p>指纹识别相信到现在 大家已经不陌生了 <a href="https://github.com/wsdydeni/fingerprint-demo">项目地址</a></p>
+
+<p>越来越多的应用支持指纹功能，心里痒痒，所以也整一个~</p>
+
+<p>做之前想了一会的流程图</p>
+
+<p><img src="https://image.wsdydeni.top/%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="" /></p>
+
+<p><strong>流程思路启发于支付宝</strong></p>
+
+<p><strong>登陆界面判断是否开启 指纹登录进入主界面可设置是否开启指纹登录</strong></p>
+
+<p>流程差不多了,该去官网瞟一瞟文档了~</p>
+
+<p><img src="https://image.wsdydeni.top/%E5%A4%9A%E8%AF%BB%E4%B9%A6%E5%B0%91%E6%92%95%E9%80%BC.png" alt="" /></p>
+
+<p><img src="https://image.wsdydeni.top/%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95%E5%9B%BE.png" alt="" /></p>
+
+<p>这个方法为核心方法 <strong>用于拉起指纹识别</strong></p>
+
+<p><code class="language-plaintext highlighter-rouge">flags</code> Int 可选标志 传0即可</p>
+
+<p><code class="language-plaintext highlighter-rouge">handler</code> Handler 可以直接传NULL</p>
+
+<p><code class="language-plaintext highlighter-rouge">crypto</code> FingerprintManagerCompat.CryptoObject? 密码对象的包装类</p>
+
+<p><code class="language-plaintext highlighter-rouge">callback</code> FingerprintManagerCompat.AuthenticationCallback 验证结果的回调</p>
+
+<p><code class="language-plaintext highlighter-rouge">cancel</code> CancellationSignal 取消操作并向取消监听器发出信号 用于取消指纹识别时</p>
+
+<h3 id="创建密封类">创建密封类</h3>
+
+<p>创建密匙时 使用AES + CBC + PADDING_PKCS7进行加密</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">CipherHelper</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">_keystore</span> <span class="p">:</span> <span class="nc">KeyStore</span>
+    <span class="nf">init</span> <span class="p">{</span>
+        <span class="n">_keystore</span> <span class="p">=</span> <span class="nc">KeyStore</span><span class="p">.</span><span class="nf">getInstance</span><span class="p">(</span><span class="nc">KEYSTORE_NAME</span><span class="p">)</span>
+        <span class="n">_keystore</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="k">null</span><span class="p">)</span>
+    <span class="p">}</span> 
+   <span class="k">companion</span> <span class="k">object</span><span class="p">{</span>
+       <span class="k">const</span> <span class="kd">val</span> <span class="py">KEY_NAME</span> <span class="p">=</span> <span class="s">"MyCipherHelper"</span> 
+       <span class="k">const</span> <span class="kd">val</span> <span class="py">KEYSTORE_NAME</span> <span class="p">=</span> <span class="s">"AndroidKeyStore"</span> 
+       <span class="k">const</span> <span class="kd">val</span> <span class="py">KEY_ALGORITHM</span> <span class="p">=</span> <span class="nc">KeyProperties</span><span class="p">.</span><span class="nc">KEY_ALGORITHM_AES</span>
+       <span class="k">const</span> <span class="kd">val</span> <span class="py">BLOCK_MODE</span> <span class="p">=</span> <span class="nc">KeyProperties</span><span class="p">.</span><span class="nc">BLOCK_MODE_CBC</span>
+       <span class="k">const</span> <span class="kd">val</span> <span class="py">ENCRYPTION_PADDING</span> <span class="p">=</span> <span class="nc">KeyProperties</span><span class="p">.</span><span class="nc">ENCRYPTION_PADDING_PKCS7</span>
+       <span class="k">const</span> <span class="kd">val</span> <span class="py">TRANSFORMATION</span> <span class="p">=</span> <span class="s">"$KEY_ALGORITHM/$BLOCK_MODE/$ENCRYPTION_PADDING"</span>
+    <span class="p">}</span>
+    <span class="k">fun</span> <span class="nf">createCipher</span><span class="p">(</span><span class="n">retry</span> <span class="p">:</span> <span class="nc">Boolean</span><span class="p">)</span> <span class="p">:</span> <span class="nc">Cipher</span><span class="p">{</span>
+        <span class="kd">val</span> <span class="py">key</span> <span class="p">=</span> <span class="nc">GetKey</span><span class="p">()</span>
+        <span class="kd">val</span> <span class="py">cipher</span> <span class="p">=</span> <span class="nc">Cipher</span><span class="p">.</span><span class="nf">getInstance</span><span class="p">(</span><span class="nc">TRANSFORMATION</span><span class="p">)</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">cipher</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nc">Cipher</span><span class="p">.</span><span class="nc">ENCRYPT_MODE</span> <span class="n">or</span> <span class="nc">Cipher</span><span class="p">.</span><span class="nc">DECRYPT_MODE</span><span class="p">,</span><span class="n">key</span><span class="p">)</span>
+        <span class="p">}</span><span class="k">catch</span> <span class="p">(</span><span class="n">e</span> <span class="p">:</span> <span class="nc">KeyPermanentlyInvalidatedException</span><span class="p">){</span> 
+           <span class="n">_keystore</span><span class="p">.</span><span class="nf">deleteEntry</span><span class="p">(</span><span class="nc">KEY_NAME</span><span class="p">)</span> 
+           <span class="k">if</span><span class="p">(</span><span class="n">retry</span><span class="p">){</span>
+                <span class="nf">createCipher</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>
+            <span class="p">}</span><span class="k">else</span><span class="p">{</span> 
+               <span class="nc">Exception</span><span class="p">(</span><span class="s">"Could not create the cipher for fingerprint authentication."</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+            <span class="p">}</span> 
+       <span class="p">}</span>  
+      <span class="k">return</span> <span class="n">cipher</span>
+    <span class="p">}</span> 
+   <span class="k">private</span> <span class="k">fun</span> <span class="nf">GetKey</span><span class="p">()</span> <span class="p">:</span> <span class="nc">Key</span> <span class="p">{</span> 
+       <span class="k">if</span><span class="p">(!</span><span class="n">_keystore</span><span class="p">.</span><span class="nf">isKeyEntry</span><span class="p">(</span><span class="nc">KEY_NAME</span><span class="p">)){</span> 
+           <span class="nc">CreateKey</span><span class="p">()</span>
+        <span class="p">}</span> 
+       <span class="k">return</span> <span class="n">_keystore</span><span class="p">.</span><span class="nf">getKey</span><span class="p">(</span><span class="nc">KEY_NAME</span><span class="p">,</span><span class="k">null</span><span class="p">)</span>
+    <span class="p">}</span> 
+   <span class="k">private</span> <span class="k">fun</span> <span class="nf">CreateKey</span><span class="p">(){</span> 
+       <span class="kd">val</span> <span class="py">keyGenerator</span> <span class="p">=</span> <span class="nc">KeyGenerator</span><span class="p">.</span><span class="nf">getInstance</span><span class="p">(</span><span class="nc">KEY_ALGORITHM</span><span class="p">,</span> <span class="nc">KEYSTORE_NAME</span><span class="p">)</span>
+        <span class="kd">val</span> <span class="py">keyGenParameterSpec</span> <span class="p">=</span> <span class="nc">KeyGenParameterSpec</span><span class="p">.</span><span class="nc">Builder</span><span class="p">(</span><span class="nc">KEY_NAME</span><span class="p">,</span> 
+           <span class="nc">KeyProperties</span><span class="p">.</span><span class="nc">PURPOSE_ENCRYPT</span> <span class="n">or</span> <span class="nc">KeyProperties</span><span class="p">.</span><span class="nc">PURPOSE_DECRYPT</span><span class="p">)</span> 
+           <span class="p">.</span><span class="nf">setBlockModes</span><span class="p">(</span><span class="nc">BLOCK_MODE</span><span class="p">)</span> 
+           <span class="p">.</span><span class="nf">setEncryptionPaddings</span><span class="p">(</span><span class="nc">ENCRYPTION_PADDING</span><span class="p">)</span>  
+           <span class="p">.</span><span class="nf">setUserAuthenticationRequired</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+           <span class="p">.</span><span class="nf">build</span><span class="p">()</span>
+        <span class="n">keyGenerator</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="n">keyGenParameterSpec</span><span class="p">)</span>
+        <span class="n">keyGenerator</span><span class="p">.</span><span class="nf">generateKey</span><span class="p">()</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<h3 id="用于验证的弹窗">用于验证的弹窗</h3>
+
+<p>话不多说 搞快搞快~</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">FingerprintVerifyDialog</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="nc">Activity</span><span class="p">):</span> <span class="nc">Dialog</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="nc">R</span><span class="p">.</span><span class="n">style</span><span class="p">.</span><span class="nc">TransparentDialogStyle</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">onClickListener</span> <span class="p">:</span> <span class="nc">OnClickListener</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">tipText</span> <span class="p">:</span> <span class="nc">TextView</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">cancelBtn</span> <span class="p">:</span> <span class="nc">TextView</span>
+    <span class="nf">init</span> <span class="p">{</span> 
+        <span class="nf">setContentView</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">finger_verify_dialog</span><span class="p">)</span>
+        <span class="nf">setCanceledOnTouchOutside</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>
+        <span class="n">tipText</span> <span class="p">=</span> <span class="nf">findViewById</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">finger_verify_tip</span><span class="p">)</span>
+        <span class="n">cancelBtn</span> <span class="p">=</span> <span class="nf">findViewById</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">cancel_finger_verify_btn</span><span class="p">)</span>
+        <span class="n">cancelBtn</span><span class="p">.</span><span class="nf">setOnClickListener</span> <span class="p">{</span> <span class="n">onClickListener</span><span class="p">.</span><span class="nf">onCancel</span><span class="p">()</span>
+            <span class="k">this</span><span class="p">.</span><span class="nf">dismiss</span><span class="p">()</span>
+         <span class="p">}</span> 
+       <span class="nf">windowAnim</span><span class="p">()</span> 
+   <span class="p">}</span> 
+   <span class="k">override</span> <span class="k">fun</span> <span class="nf">onBackPressed</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="p">.</span><span class="nf">onBackPressed</span><span class="p">()</span>
+        <span class="n">onClickListener</span><span class="p">.</span><span class="nf">onDismiss</span><span class="p">()</span>
+    <span class="p">}</span> 
+   <span class="k">fun</span> <span class="nf">setOnClickListener</span><span class="p">(</span><span class="n">onClickListener</span><span class="p">:</span> <span class="nc">OnClickListener</span><span class="p">)</span> <span class="p">:</span> <span class="nc">FingerprintVerifyDialog</span><span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">onClickListener</span> <span class="p">=</span> <span class="n">onClickListener</span>
+        <span class="k">return</span> <span class="k">this</span>
+    <span class="p">}</span>
+    <span class="k">fun</span> <span class="nf">setTipText</span><span class="p">(</span><span class="n">tip</span> <span class="p">:</span> <span class="nc">String</span><span class="p">,</span><span class="n">color</span> <span class="p">:</span> <span class="nc">Int</span><span class="p">){</span>
+        <span class="n">tipText</span><span class="p">.</span><span class="n">text</span> <span class="p">=</span> <span class="n">tip</span> 
+        <span class="n">tipText</span><span class="p">.</span><span class="nf">setTextColor</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="kd">interface</span> <span class="nc">OnClickListener</span><span class="p">{</span>
+        <span class="k">fun</span> <span class="nf">onCancel</span><span class="p">()</span> 
+        <span class="k">fun</span> <span class="nf">onDismiss</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">windowAnim</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">window</span> <span class="p">=</span> <span class="n">window</span><span class="o">!!</span> <span class="c1">//得到对话框 </span>
+        <span class="n">window</span><span class="p">.</span><span class="nf">setWindowAnimations</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">style</span><span class="p">.</span><span class="n">dialogWindowAnim</span><span class="p">)</span> <span class="c1">//设置窗口弹出动画</span>
+        <span class="n">window</span><span class="p">.</span><span class="nf">setType</span><span class="p">(</span><span class="nc">WindowManager</span><span class="p">.</span><span class="nc">LayoutParams</span><span class="p">.</span><span class="nc">TYPE_APPLICATION_PANEL</span><span class="p">)</span>
+        <span class="n">window</span><span class="p">.</span><span class="nf">setFlags</span><span class="p">(</span><span class="nc">WindowManager</span><span class="p">.</span><span class="nc">LayoutParams</span><span class="p">.</span><span class="nc">FLAG_FULLSCREEN</span><span class="p">,</span> <span class="nc">WindowManager</span><span class="p">.</span><span class="nc">LayoutParams</span><span class="p">.</span><span class="nc">FLAG_FULLSCREEN</span><span class="p">)</span>
+        <span class="n">window</span><span class="p">.</span><span class="nf">setLayout</span><span class="p">(</span><span class="nc">ViewGroup</span><span class="p">.</span><span class="nc">LayoutParams</span><span class="p">.</span><span class="nc">MATCH_PARENT</span><span class="p">,</span> <span class="nc">ViewGroup</span><span class="p">.</span><span class="nc">LayoutParams</span><span class="p">.</span><span class="nc">MATCH_PARENT</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<h3 id="本地sp存储记录">本地SP存储记录</h3>
+
+<p><strong>做一个sharedPreferences的扩展类,并通过委托来访问</strong></p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">MyPreference</span><span class="p">&lt;</span><span class="nc">T</span><span class="p">&gt;(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">name</span> <span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="k">private</span> <span class="kd">val</span> <span class="py">default</span> <span class="p">:</span> <span class="nc">T</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="kd">val</span> <span class="py">sharedPreferences</span> <span class="p">:</span> <span class="nc">SharedPreferences</span>
+            <span class="k">by</span> <span class="nf">lazy</span> <span class="p">{</span> <span class="nc">MyApplication</span><span class="p">.</span><span class="n">instance</span><span class="p">.</span><span class="n">applicationContext</span><span class="p">.</span><span class="nf">getSharedPreferences</span><span class="p">(</span><span class="nc">Constans</span><span class="p">.</span><span class="nc">SHARE_PREFERENCE_NAME</span><span class="p">,</span><span class="nc">Context</span><span class="p">.</span><span class="nc">MODE_PRIVATE</span><span class="p">)}</span> 
+    <span class="k">operator</span> <span class="k">fun</span> <span class="nf">getValue</span><span class="p">(</span><span class="n">thisRef</span> <span class="p">:</span> <span class="nc">Any</span><span class="p">?,</span><span class="n">property</span> <span class="p">:</span> <span class="nc">KProperty</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;)</span> <span class="p">:</span> <span class="nc">T</span> <span class="p">=</span> <span class="nf">getSharedPreferences</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">default</span><span class="p">)</span>
+    <span class="k">operator</span> <span class="k">fun</span> <span class="nf">setValue</span><span class="p">(</span><span class="n">thisRef</span><span class="p">:</span> <span class="nc">Any</span><span class="p">?,</span><span class="n">property</span><span class="p">:</span> <span class="nc">KProperty</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;,</span><span class="n">value</span><span class="p">:</span> <span class="nc">T</span><span class="p">)</span> <span class="p">=</span> <span class="nf">putSharedPreferences</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">putSharedPreferences</span><span class="p">(</span><span class="n">name</span> <span class="p">:</span> <span class="nc">String</span><span class="p">,</span><span class="n">value</span> <span class="p">:</span> <span class="nc">T</span><span class="p">)</span>  <span class="p">=</span> <span class="nf">with</span><span class="p">(</span><span class="n">sharedPreferences</span><span class="p">.</span><span class="nf">edit</span><span class="p">()){</span>
+        <span class="k">when</span><span class="p">(</span><span class="n">value</span><span class="p">){</span>
+            <span class="k">is</span> <span class="nc">Int</span> <span class="p">-&gt;</span> <span class="nf">putInt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">is</span> <span class="nc">String</span> <span class="p">-&gt;</span> <span class="nf">putString</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">is</span> <span class="nc">Float</span> <span class="p">-&gt;</span> <span class="nf">putFloat</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">is</span> <span class="nc">Long</span> <span class="p">-&gt;</span> <span class="nf">putLong</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">is</span> <span class="nc">Boolean</span> <span class="p">-&gt;</span> <span class="nf">putBoolean</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">-&gt;</span> <span class="k">throw</span> <span class="nc">IllegalArgumentException</span><span class="p">(</span><span class="s">"SharedPreference can't be save this type"</span><span class="p">)</span>
+        <span class="p">}.</span><span class="nf">apply</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">getSharedPreferences</span><span class="p">(</span><span class="n">name</span> <span class="p">:</span> <span class="nc">String</span><span class="p">,</span><span class="n">default</span><span class="p">:</span> <span class="nc">T</span><span class="p">)</span> <span class="p">:</span> <span class="nc">T</span> <span class="p">=</span> <span class="nf">with</span><span class="p">(</span><span class="n">sharedPreferences</span><span class="p">){</span>
+        <span class="kd">val</span> <span class="py">res</span> <span class="p">:</span> <span class="nc">Any</span> <span class="p">=</span> <span class="k">when</span><span class="p">(</span><span class="n">default</span><span class="p">){</span>
+            <span class="k">is</span> <span class="nc">Int</span> <span class="p">-&gt;</span> <span class="nf">getInt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">default</span><span class="p">)</span>
+            <span class="k">is</span> <span class="nc">Boolean</span> <span class="p">-&gt;</span> <span class="nf">getBoolean</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">default</span><span class="p">)</span>
+            <span class="k">is</span> <span class="nc">String</span> <span class="p">-&gt;</span> <span class="nf">getString</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">default</span><span class="p">)</span><span class="o">!!</span>
+            <span class="k">is</span> <span class="nc">Float</span> <span class="p">-&gt;</span> <span class="nf">getFloat</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">default</span><span class="p">)</span>
+            <span class="k">is</span> <span class="nc">Long</span> <span class="p">-&gt;</span> <span class="nf">getLong</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">default</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">-&gt;</span> <span class="k">throw</span> <span class="nc">IllegalArgumentException</span><span class="p">(</span><span class="s">"SharedPreference can't be get this type"</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">res</span> <span class="k">as</span> <span class="nc">T</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="kd">object</span> <span class="nc">DelegatesExt</span> <span class="p">{</span>
+    <span class="k">fun</span> <span class="p">&lt;</span><span class="nc">T</span><span class="p">&gt;</span> <span class="nf">myPreferences</span><span class="p">(</span><span class="n">name</span> <span class="p">:</span> <span class="nc">String</span><span class="p">,</span><span class="n">default</span> <span class="p">:</span> <span class="nc">T</span><span class="p">)</span> <span class="p">=</span> <span class="nc">MyPreference</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">default</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="kd">class</span> <span class="nc">Constans</span><span class="p">{</span>
+    <span class="k">companion</span> <span class="k">object</span><span class="p">{</span>
+        <span class="k">const</span> <span class="kd">val</span> <span class="py">SHARE_PREFERENCE_NAME</span> <span class="p">=</span> <span class="s">"MySharePreference"</span>
+        <span class="k">const</span> <span class="kd">val</span> <span class="py">OPEN_FINGERPRINT_LOGIN</span> <span class="p">=</span> <span class="s">"open_fingerprint_login"</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<h3 id="用于回调的监听接口">用于回调的监听接口</h3>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">interface</span> <span class="nc">FingerprintCallback</span> <span class="p">{</span>
+    <span class="cm">/**
+    * @description 无指纹硬件或硬件不可用
+    */</span>
+    <span class="k">fun</span> <span class="nf">onHwUnavailable</span><span class="p">()</span>
+    <span class="cm">/**
+    * @description 未添加指纹
+    */</span>
+    <span class="k">fun</span> <span class="nf">onNoneEnrolled</span><span class="p">()</span> 
+   <span class="cm">/**
+    * @description 验证成功
+    */</span>
+    <span class="k">fun</span> <span class="nf">onSucceeded</span><span class="p">()</span>
+    <span class="cm">/**
+    * @description 验证失败
+    */</span> 
+   <span class="k">fun</span> <span class="nf">onFailed</span><span class="p">()</span>
+    <span class="cm">/**
+    * @description 取消验证
+    */</span>
+    <span class="k">fun</span> <span class="nf">onCancel</span><span class="p">()</span>
+<span class="p">}</span></code></pre></figure>
+
+<h3 id="指纹识别扩展类"><strong>指纹识别扩展类</strong></h3>
+
+<p><strong><em>提前初始初始化加密类 封装指纹验证方法 开始指纹验证</em></strong></p>
+
+<p><strong><em>添加监听 对验证结果回调处理 判断设备是否支持指纹识别</em></strong></p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">FingerprintImpl</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">context</span><span class="p">:</span> <span class="nc">Activity</span> 
+    <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">fingerprintCallback</span><span class="p">:</span> <span class="nc">FingerprintCallback</span> <span class="c1">//验证回调</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">fingerprintVerifyDialog</span><span class="p">:</span> <span class="nc">FingerprintVerifyDialog</span> <span class="c1">//验证弹窗</span>
+    <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">cancellationSignal</span> <span class="p">:</span> <span class="nc">CancellationSignal</span>
+    <span class="k">companion</span> <span class="k">object</span><span class="p">{</span>
+        <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">cryptoObject</span> <span class="p">:</span> <span class="nc">CryptoObject</span>
+        <span class="kd">val</span> <span class="py">instance</span> <span class="k">by</span> <span class="nf">lazy</span> <span class="p">{</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">cryptoObject</span> <span class="p">=</span> <span class="nc">CryptoObject</span><span class="p">(</span><span class="nc">CipherHelper</span><span class="p">().</span><span class="nf">createCipher</span><span class="p">(</span><span class="k">true</span><span class="p">))</span>
+            <span class="p">}</span><span class="k">catch</span> <span class="p">(</span><span class="n">e</span> <span class="p">:</span> <span class="nc">Exception</span><span class="p">){</span>
+                <span class="n">e</span><span class="p">.</span><span class="nf">printStackTrace</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="nc">FingerprintImpl</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="cm">/**
+    * @description 初始化并调用指纹验证
+    */</span>
+    <span class="k">fun</span> <span class="nf">authenticate</span><span class="p">(</span><span class="n">context</span> <span class="p">:</span> <span class="nc">Activity</span><span class="p">,</span><span class="n">callback</span><span class="p">:</span> <span class="nc">FingerprintCallback</span><span class="p">){</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">context</span> <span class="p">=</span> <span class="n">context</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">fingerprintCallback</span> <span class="p">=</span> <span class="n">callback</span>
+        <span class="n">cancellationSignal</span> <span class="p">=</span> <span class="nc">CancellationSignal</span><span class="p">()</span>
+        <span class="n">fingerprintVerifyDialog</span> <span class="p">=</span> <span class="nc">FingerprintVerifyDialog</span><span class="p">(</span><span class="n">context</span><span class="p">).</span><span class="nf">setOnClickListener</span><span class="p">(</span><span class="n">onClickListener</span><span class="p">)</span>
+        <span class="n">cancellationSignal</span><span class="p">.</span><span class="nf">setOnCancelListener</span> <span class="p">{</span> <span class="n">fingerprintVerifyDialog</span><span class="p">.</span><span class="nf">dismiss</span><span class="p">()</span> <span class="p">}</span>
+        <span class="nf">from</span><span class="p">(</span><span class="n">context</span><span class="p">).</span><span class="nf">authenticate</span><span class="p">(</span><span class="n">cryptoObject</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">cancellationSignal</span><span class="p">,</span><span class="n">authenticationCallback</span><span class="p">,</span><span class="k">null</span><span class="p">)</span>
+        <span class="n">fingerprintVerifyDialog</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
+    <span class="p">}</span>
+   <span class="k">fun</span> <span class="nf">canAuthenticate</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="nc">Context</span><span class="p">,</span><span class="n">fingerprintCallback</span><span class="p">:</span> <span class="nc">FingerprintCallback</span><span class="p">)</span> <span class="p">:</span> <span class="nc">Boolean</span><span class="p">{</span>
+        <span class="k">if</span><span class="p">(!</span><span class="nf">from</span><span class="p">(</span><span class="n">context</span><span class="p">).</span><span class="n">isHardwareDetected</span><span class="p">){</span> <span class="c1">//是否支持指纹识别</span>
+            <span class="n">fingerprintCallback</span><span class="p">.</span><span class="nf">onHwUnavailable</span><span class="p">()</span> 
+            <span class="k">return</span> <span class="k">false</span>
+        <span class="p">}</span> 
+        <span class="k">if</span><span class="p">(!</span><span class="nf">from</span><span class="p">(</span><span class="n">context</span><span class="p">).</span><span class="nf">hasEnrolledFingerprints</span><span class="p">()){</span> <span class="c1">//是否已经添加指纹</span>
+            <span class="n">fingerprintCallback</span><span class="p">.</span><span class="nf">onNoneEnrolled</span><span class="p">()</span>
+            <span class="k">return</span> <span class="k">false</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="k">true</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<h3 id="最后封装">最后封装</h3>
+
+<p><strong><em>只需传入回调处理就可以直接使用</em></strong></p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="kd">class</span> <span class="nc">FingerprintManager</span><span class="p">(</span><span class="k">private</span> <span class="kd">var</span> <span class="py">context</span><span class="p">:</span> <span class="nc">Activity</span><span class="p">,</span> 
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">callback</span><span class="p">:</span> <span class="nc">FingerprintCallback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//是否支持指纹识别</span>
+    <span class="kd">var</span> <span class="py">isSupportFingerLogin</span> <span class="p">:</span> <span class="nc">Boolean</span> <span class="p">=</span> <span class="k">false</span>
+    <span class="k">private</span> <span class="kd">var</span> <span class="py">fingerprintImpl</span> <span class="p">:</span> <span class="nc">FingerprintImpl</span> <span class="p">=</span> <span class="nc">FingerprintImpl</span><span class="p">.</span><span class="n">instance</span>
+    <span class="nf">init</span> <span class="p">{</span>
+        <span class="n">isSupportFingerLogin</span> <span class="p">=</span> <span class="n">fingerprintImpl</span><span class="p">.</span><span class="nf">canAuthenticate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="n">callback</span><span class="p">)</span>
+    <span class="p">}</span>
+   <span class="cm">/**
+    * @description 开始指纹识别
+    */</span> 
+   <span class="k">fun</span> <span class="nf">autherticate</span><span class="p">(){</span> 
+       <span class="n">fingerprintImpl</span><span class="p">.</span><span class="nf">authenticate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="n">callback</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>大功告成了 本文的效果图就不放了 有兴趣的朋友拉下来运行即可</p>
+
+<hr />
+
+<p><strong><em>感谢您的阅读 有什么问题可以留言交流</em></strong></p>
+
+      </div>
+      <!-- <div class="post__share">
+        <span class="share__title">Share this article:</span>
+        <ul class="share__list list-reset">
+          <li class="share__item">
+            <a class="share__facebook" href="https://www.facebook.com/sharer/sharer.php?u=/2020/07/25/analysis-of-android-fingerprint-recognition/"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+              title="Share on Facebook" rel="nofollow"><i class="ion ion-logo-facebook"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__twitter" href="https://twitter.com/intent/tweet?text=Android%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB%E6%B5%85%E6%9E%90&url=/2020/07/25/analysis-of-android-fingerprint-recognition/"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+              title="Share on Twitter" rel="nofollow"><i class="ion ion-logo-twitter"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=/2020/07/25/analysis-of-android-fingerprint-recognition/&title=Android%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB%E6%B5%85%E6%9E%90&summary=&source="
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn" rel="nofollow"><i class="ion ion-logo-linkedin"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__pinterest" href="http://pinterest.com/pin/create/button/?url=/2020/07/25/analysis-of-android-fingerprint-recognition/&amp;media=/images/https://image.wsdydeni.top/orange.jpg&amp;description=Android%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB%E6%B5%85%E6%9E%90"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Pinterest"
+              rel="nofollow"><i class="ion ion-logo-pinterest"></i></a>
+          </li>
+        </ul>
+      </div> -->
+    </article>
+    <!-- end post -->
+    </div>
+  </div>
+
+  <div class="container">
+  <div class="post__navigation">
+    
+    <div class="prev">
+      <a class="post__nav__image" href="/2020/07/19/android-custom-view-slider-verification-code/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></a>
+      <h2 class="post__nav__title">
+        <i class="ion ion-md-arrow-back"></i>
+        <a href="/2020/07/19/android-custom-view-slider-verification-code/">Android自定义View之滑块验证码</a>
+      </h2>
+      <!-- <p class="prev__excerpt">
+        
+          啥也不说了 直接就是给上项目地址 有兴趣的朋友直接拖源码吧
+
+
+
+滑块验证码相信各位看官老爷一定使用过 所以决定上手做一个
+
+分析
+
+SlidePuzzle分成了俩块 上方的Puzzle以及下方的SlideBar
+...
+        
+      </p> -->
+    </div>
+    
+
+    
+    <div class="next">
+      <a class="post__nav__image" href="/2020/07/29/android-handler-details/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)">
+      </a>
+      <h2 class="post__nav__title">
+        <a href="/2020/07/29/android-handler-details/">浅谈Android消息机制</a>
+        <i class="ion ion-md-arrow-forward"></i>
+      </h2>
+      <!-- <p class="next__excerpt">
+        
+          ## 概览
+
+Android 消息机制用于多线程通信
+
+### 进程与线程
+
+既然要讨论的是多线程通信，那么就得知道什么是线程。
+
+说到线程，必须得了解进程是什么。
+
+> 进程是操作系统对一个正在运行的程序的一种抽...
+        
+      </p> -->
+    </div>
+    
+  </div>
+
+  <!--  -->
+  
+  <!--   gitalk       -->
+
+  <div class="comment">
+    <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+    var gitalk = new Gitalk({
+        id: 'Android指纹识别浅析',
+        clientID: '5ba623a6d85f6c769ba1',
+        clientSecret: 'b5a11d32fa5613e027d9463a19c49e1f0813a079',
+        repo: 'wsdydeni.github.io',
+        owner: 'wsdydeni',
+        admin: ['wsdydeni'], 
+      labels: ['Gitalk'],
+    })
+    gitalk.render('gitalk-container')
+    </script> 
+  </div>
+
 </div>
-
-
 
   </main>
   <!-- end content -->

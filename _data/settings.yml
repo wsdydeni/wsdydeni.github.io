@@ -9,7 +9,7 @@ description:
 # Author Settings
 author:
   name: 无伤大雅的你呀
-  image: owl.jpg
+  image: https://image.wsdydeni.top/owl.jpg
   say-hello: 你好, 我是 <strong>无伤大雅的你呀</strong>
   bio: 欢迎来到我的个人博客
 

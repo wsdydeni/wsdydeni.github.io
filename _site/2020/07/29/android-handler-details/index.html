@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>浅谈Android消息机制</title>
+  <meta name='description' content=''>
+
+  <link rel="canonical" href="/2020/07/29/android-handler-details/">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+  <!-- Ionicons -->
+  <link href="https://unpkg.com/ionicons@4.2.2/dist/css/ionicons.min.css" rel="stylesheet">
+
+  <script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?90715077f3983fdb5f88bb73a59bb448";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+    
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z7G9RK5D1Q"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z7G9RK5D1Q');
+</script>
+
+  
+
+  <style>
+    /* 这里不能删除 删除样式报错 */
+  /* 
+  .text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.block{display:block}.inline-block{display:inline-block}.inline{display:inline}.vertical-center{display:flex;align-items:center;justify-content:center}.show{display:block}.hide{display:none}.invisible{visibility:hidden}.float-left{float:left}.float-right{float:right}.no-padding{padding:0}.no-margin{margin:0}.list-reset{list-style-type:none;margin:0;padding:0}.clearfix::after,.clearfix ::before{content:"";display:table;clear:both}.screen-reader-text{clip:rect(1px, 1px, 1px, 1px);height:1px;overflow:hidden;position:absolute !important;width:1px;word-wrap:normal !important}/*! normalize.css v8.0.0 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}h1{font-size:2em;margin:0.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace, monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace, monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-0.25em}sup{top:-0.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}button,[type="button"],[type="reset"],[type="submit"]{-webkit-appearance:button}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring,[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:0.35em 0.75em 0.625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto}[type="search"]{-webkit-appearance:textfield;outline-offset:-2px}[type="search"]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}body,h1,h2,h3,h4,h5,h6,p,blockquote,pre,dl,dd,ol,ul,fieldset,legend,figure,hr{margin:0;padding:0}li>ul,li>ol{margin-bottom:0}table{border-collapse:collapse;border-spacing:0}h1,h2,h3,h4,h5,h6,ul,ol,dl,blockquote,p,address,hr,table,fieldset,figure,pre{margin-bottom:20px}ul,ol,dd{margin-left:20px}.highlight{background:#f8f8f8}.highlighter-rouge .highlight{background:#eef}.highlight .c{color:#998;font-style:italic}.highlight .err{color:#a61717;background-color:#e3d2d2}.highlight .k{font-weight:bold}.highlight .o{font-weight:bold}.highlight .cm{color:#998;font-style:italic}.highlight .cp{color:#999;font-weight:bold}.highlight .c1{color:#998;font-style:italic}.highlight .cs{color:#999;font-weight:bold;font-style:italic}.highlight .gd{color:#000;background-color:#fdd}.highlight .gd .x{color:#000;background-color:#faa}.highlight .ge{font-style:italic}.highlight .gr{color:#a00}.highlight .gh{color:#999}.highlight .gi{color:#000;background-color:#dfd}.highlight .gi .x{color:#000;background-color:#afa}.highlight .go{color:#888}.highlight .gp{color:#555}.highlight .gs{font-weight:bold}.highlight .gu{color:#aaa}.highlight .gt{color:#a00}.highlight .kc{font-weight:bold}.highlight .kd{font-weight:bold}.highlight .kp{font-weight:bold}.highlight .kr{font-weight:bold}.highlight .kt{color:#458;font-weight:bold}.highlight .m{color:#099}.highlight .s{color:#d14}.highlight .na{color:#008080}.highlight .nb{color:#0086B3}.highlight .nc{color:#458;font-weight:bold}.highlight .no{color:#008080}.highlight .ni{color:#800080}.highlight .ne{color:#900;font-weight:bold}.highlight .nf{color:#900;font-weight:bold}.highlight .nn{color:#555}.highlight .nt{color:#000080}.highlight .nv{color:#008080}.highlight .ow{font-weight:bold}.highlight .w{color:#bbb}.highlight .mf{color:#099}.highlight .mh{color:#099}.highlight .mi{color:#099}.highlight .mo{color:#099}.highlight .sb{color:#d14}.highlight .sc{color:#d14}.highlight .sd{color:#d14}.highlight .s2{color:#d14}.highlight .se{color:#d14}.highlight .sh{color:#d14}.highlight .si{color:#d14}.highlight .sx{color:#d14}.highlight .sr{color:#009926}.highlight .s1{color:#d14}.highlight .ss{color:#990073}.highlight .bp{color:#999}.highlight .vc{color:#008080}.highlight .vg{color:#008080}.highlight .vi{color:#008080}.highlight .il{color:#099}.container{max-width:1200px;padding-left:20px;padding-right:20px;margin:0 auto}.container-full{max-width:100%;padding-left:20px;padding-right:20px;margin:0 auto}.row{display:flex;flex-wrap:wrap;flex:0 1 auto;flex-direction:row;box-sizing:border-box;margin-left:-20px;margin-right:-20px}.row2{flex-wrap:wrap;flex:0 1 auto;flex-direction:row;box-sizing:border-box;margin-left:-20px;margin-right:-20px}.col{padding-left:20px;padding-right:20px}[class^="col-"]{flex:auto}.col-0{width:0%}.col-1{width:8.3333333333%}.col-2{width:16.6666666667%}.col-3{width:25%}.col-4{width:33.3333333333%}.col-5{width:41.6666666667%}.col-6{width:50%}.col-7{width:58.3333333333%}.col-8{width:66.6666666667%}.col-9{width:75%}.col-10{width:83.3333333333%}.col-11{width:91.6666666667%}.col-12{width:100%}.push-0{margin-left:0%}.push-1{margin-left:8.3333333333%}.push-2{margin-left:16.6666666667%}.push-3{margin-left:25%}.push-4{margin-left:33.3333333333%}.push-5{margin-left:41.6666666667%}.push-6{margin-left:50%}.push-7{margin-left:58.3333333333%}.push-8{margin-left:66.6666666667%}.push-9{margin-left:75%}.push-10{margin-left:83.3333333333%}.push-11{margin-left:91.6666666667%}.push-12{margin-left:100%}.pull-0{margin-right:0%}.pull-1{margin-right:8.3333333333%}.pull-2{margin-right:16.6666666667%}.pull-3{margin-right:25%}.pull-4{margin-right:33.3333333333%}.pull-5{margin-right:41.6666666667%}.pull-6{margin-right:50%}.pull-7{margin-right:58.3333333333%}.pull-8{margin-right:66.6666666667%}.pull-9{margin-right:75%}.pull-10{margin-right:83.3333333333%}.pull-11{margin-right:91.6666666667%}.pull-12{margin-right:100%}@media (max-width: 992px){.col-d-0{width:0%}.col-d-1{width:8.3333333333%}.col-d-2{width:16.6666666667%}.col-d-3{width:25%}.col-d-4{width:33.3333333333%}.col-d-5{width:41.6666666667%}.col-d-6{width:50%}.col-d-7{width:58.3333333333%}.col-d-8{width:66.6666666667%}.col-d-9{width:75%}.col-d-10{width:83.3333333333%}.col-d-11{width:91.6666666667%}.col-d-12{width:100%}.push-d-0{margin-left:0%}.push-d-1{margin-left:8.3333333333%}.push-d-2{margin-left:16.6666666667%}.push-d-3{margin-left:25%}.push-d-4{margin-left:33.3333333333%}.push-d-5{margin-left:41.6666666667%}.push-d-6{margin-left:50%}.push-d-7{margin-left:58.3333333333%}.push-d-8{margin-left:66.6666666667%}.push-d-9{margin-left:75%}.push-d-10{margin-left:83.3333333333%}.push-d-11{margin-left:91.6666666667%}.push-d-12{margin-left:100%}.pull-d-0{margin-right:0%}.pull-d-1{margin-right:8.3333333333%}.pull-d-2{margin-right:16.6666666667%}.pull-d-3{margin-right:25%}.pull-d-4{margin-right:33.3333333333%}.pull-d-5{margin-right:41.6666666667%}.pull-d-6{margin-right:50%}.pull-d-7{margin-right:58.3333333333%}.pull-d-8{margin-right:66.6666666667%}.pull-d-9{margin-right:75%}.pull-d-10{margin-right:83.3333333333%}.pull-d-11{margin-right:91.6666666667%}.pull-d-12{margin-right:100%}}@media (max-width: 768px){.col-t-0{width:0%}.col-t-1{width:8.3333333333%}.col-t-2{width:16.6666666667%}.col-t-3{width:25%}.col-t-4{width:33.3333333333%}.col-t-5{width:41.6666666667%}.col-t-6{width:50%}.col-t-7{width:58.3333333333%}.col-t-8{width:66.6666666667%}.col-t-9{width:75%}.col-t-10{width:83.3333333333%}.col-t-11{width:91.6666666667%}.col-t-12{width:100%}.push-t-0{margin-left:0%}.push-t-1{margin-left:8.3333333333%}.push-t-2{margin-left:16.6666666667%}.push-t-3{margin-left:25%}.push-t-4{margin-left:33.3333333333%}.push-t-5{margin-left:41.6666666667%}.push-t-6{margin-left:50%}.push-t-7{margin-left:58.3333333333%}.push-t-8{margin-left:66.6666666667%}.push-t-9{margin-left:75%}.push-t-10{margin-left:83.3333333333%}.push-t-11{margin-left:91.6666666667%}.push-t-12{margin-left:100%}.pull-t-0{margin-right:0%}.pull-t-1{margin-right:8.3333333333%}.pull-t-2{margin-right:16.6666666667%}.pull-t-3{margin-right:25%}.pull-t-4{margin-right:33.3333333333%}.pull-t-5{margin-right:41.6666666667%}.pull-t-6{margin-right:50%}.pull-t-7{margin-right:58.3333333333%}.pull-t-8{margin-right:66.6666666667%}.pull-t-9{margin-right:75%}.pull-t-10{margin-right:83.3333333333%}.pull-t-11{margin-right:91.6666666667%}.pull-t-12{margin-right:100%}}@media (max-width: 576px){.col-m-0{width:0%}.col-m-1{width:8.3333333333%}.col-m-2{width:16.6666666667%}.col-m-3{width:25%}.col-m-4{width:33.3333333333%}.col-m-5{width:41.6666666667%}.col-m-6{width:50%}.col-m-7{width:58.3333333333%}.col-m-8{width:66.6666666667%}.col-m-9{width:75%}.col-m-10{width:83.3333333333%}.col-m-11{width:91.6666666667%}.col-m-12{width:100%}.push-m-0{margin-left:0%}.push-m-1{margin-left:8.3333333333%}.push-m-2{margin-left:16.6666666667%}.push-m-3{margin-left:25%}.push-m-4{margin-left:33.3333333333%}.push-m-5{margin-left:41.6666666667%}.push-m-6{margin-left:50%}.push-m-7{margin-left:58.3333333333%}.push-m-8{margin-left:66.6666666667%}.push-m-9{margin-left:75%}.push-m-10{margin-left:83.3333333333%}.push-m-11{margin-left:91.6666666667%}.push-m-12{margin-left:100%}.pull-m-0{margin-right:0%}.pull-m-1{margin-right:8.3333333333%}.pull-m-2{margin-right:16.6666666667%}.pull-m-3{margin-right:25%}.pull-m-4{margin-right:33.3333333333%}.pull-m-5{margin-right:41.6666666667%}.pull-m-6{margin-right:50%}.pull-m-7{margin-right:58.3333333333%}.pull-m-8{margin-right:66.6666666667%}.pull-m-9{margin-right:75%}.pull-m-10{margin-right:83.3333333333%}.pull-m-11{margin-right:91.6666666667%}.pull-m-12{margin-right:100%}}@media (max-width: 992px){.col-d-0{width:0%}.col-d-1{width:8.3333333333%}.col-d-2{width:16.6666666667%}.col-d-3{width:25%}.col-d-4{width:33.3333333333%}.col-d-5{width:41.6666666667%}.col-d-6{width:50%}.col-d-7{width:58.3333333333%}.col-d-8{width:66.6666666667%}.col-d-9{width:75%}.col-d-10{width:83.3333333333%}.col-d-11{width:91.6666666667%}.col-d-12{width:100%}.push-d-0{margin-left:0%}.push-d-1{margin-left:8.3333333333%}.push-d-2{margin-left:16.6666666667%}.push-d-3{margin-left:25%}.push-d-4{margin-left:33.3333333333%}.push-d-5{margin-left:41.6666666667%}.push-d-6{margin-left:50%}.push-d-7{margin-left:58.3333333333%}.push-d-8{margin-left:66.6666666667%}.push-d-9{margin-left:75%}.push-d-10{margin-left:83.3333333333%}.push-d-11{margin-left:91.6666666667%}.push-d-12{margin-left:100%}.pull-d-0{margin-right:0%}.pull-d-1{margin-right:8.3333333333%}.pull-d-2{margin-right:16.6666666667%}.pull-d-3{margin-right:25%}.pull-d-4{margin-right:33.3333333333%}.pull-d-5{margin-right:41.6666666667%}.pull-d-6{margin-right:50%}.pull-d-7{margin-right:58.3333333333%}.pull-d-8{margin-right:66.6666666667%}.pull-d-9{margin-right:75%}.pull-d-10{margin-right:83.3333333333%}.pull-d-11{margin-right:91.6666666667%}.pull-d-12{margin-right:100%}}@media (max-width: 768px){.col-t-0{width:0%}.col-t-1{width:8.3333333333%}.col-t-2{width:16.6666666667%}.col-t-3{width:25%}.col-t-4{width:33.3333333333%}.col-t-5{width:41.6666666667%}.col-t-6{width:50%}.col-t-7{width:58.3333333333%}.col-t-8{width:66.6666666667%}.col-t-9{width:75%}.col-t-10{width:83.3333333333%}.col-t-11{width:91.6666666667%}.col-t-12{width:100%}.push-t-0{margin-left:0%}.push-t-1{margin-left:8.3333333333%}.push-t-2{margin-left:16.6666666667%}.push-t-3{margin-left:25%}.push-t-4{margin-left:33.3333333333%}.push-t-5{margin-left:41.6666666667%}.push-t-6{margin-left:50%}.push-t-7{margin-left:58.3333333333%}.push-t-8{margin-left:66.6666666667%}.push-t-9{margin-left:75%}.push-t-10{margin-left:83.3333333333%}.push-t-11{margin-left:91.6666666667%}.push-t-12{margin-left:100%}.pull-t-0{margin-right:0%}.pull-t-1{margin-right:8.3333333333%}.pull-t-2{margin-right:16.6666666667%}.pull-t-3{margin-right:25%}.pull-t-4{margin-right:33.3333333333%}.pull-t-5{margin-right:41.6666666667%}.pull-t-6{margin-right:50%}.pull-t-7{margin-right:58.3333333333%}.pull-t-8{margin-right:66.6666666667%}.pull-t-9{margin-right:75%}.pull-t-10{margin-right:83.3333333333%}.pull-t-11{margin-right:91.6666666667%}.pull-t-12{margin-right:100%}}@media (max-width: 576px){.col-m-0{width:0%}.col-m-1{width:8.3333333333%}.col-m-2{width:16.6666666667%}.col-m-3{width:25%}.col-m-4{width:33.3333333333%}.col-m-5{width:41.6666666667%}.col-m-6{width:50%}.col-m-7{width:58.3333333333%}.col-m-8{width:66.6666666667%}.col-m-9{width:75%}.col-m-10{width:83.3333333333%}.col-m-11{width:91.6666666667%}.col-m-12{width:100%}.push-m-0{margin-left:0%}.push-m-1{margin-left:8.3333333333%}.push-m-2{margin-left:16.6666666667%}.push-m-3{margin-left:25%}.push-m-4{margin-left:33.3333333333%}.push-m-5{margin-left:41.6666666667%}.push-m-6{margin-left:50%}.push-m-7{margin-left:58.3333333333%}.push-m-8{margin-left:66.6666666667%}.push-m-9{margin-left:75%}.push-m-10{margin-left:83.3333333333%}.push-m-11{margin-left:91.6666666667%}.push-m-12{margin-left:100%}.pull-m-0{margin-right:0%}.pull-m-1{margin-right:8.3333333333%}.pull-m-2{margin-right:16.6666666667%}.pull-m-3{margin-right:25%}.pull-m-4{margin-right:33.3333333333%}.pull-m-5{margin-right:41.6666666667%}.pull-m-6{margin-right:50%}.pull-m-7{margin-right:58.3333333333%}.pull-m-8{margin-right:66.6666666667%}.pull-m-9{margin-right:75%}.pull-m-10{margin-right:83.3333333333%}.pull-m-11{margin-right:91.6666666667%}.pull-m-12{margin-right:100%}}@media (max-width: 992px){.col-d-0{width:0%}.col-d-1{width:8.3333333333%}.col-d-2{width:16.6666666667%}.col-d-3{width:25%}.col-d-4{width:33.3333333333%}.col-d-5{width:41.6666666667%}.col-d-6{width:50%}.col-d-7{width:58.3333333333%}.col-d-8{width:66.6666666667%}.col-d-9{width:75%}.col-d-10{width:83.3333333333%}.col-d-11{width:91.6666666667%}.col-d-12{width:100%}.push-d-0{margin-left:0%}.push-d-1{margin-left:8.3333333333%}.push-d-2{margin-left:16.6666666667%}.push-d-3{margin-left:25%}.push-d-4{margin-left:33.3333333333%}.push-d-5{margin-left:41.6666666667%}.push-d-6{margin-left:50%}.push-d-7{margin-left:58.3333333333%}.push-d-8{margin-left:66.6666666667%}.push-d-9{margin-left:75%}.push-d-10{margin-left:83.3333333333%}.push-d-11{margin-left:91.6666666667%}.push-d-12{margin-left:100%}.pull-d-0{margin-right:0%}.pull-d-1{margin-right:8.3333333333%}.pull-d-2{margin-right:16.6666666667%}.pull-d-3{margin-right:25%}.pull-d-4{margin-right:33.3333333333%}.pull-d-5{margin-right:41.6666666667%}.pull-d-6{margin-right:50%}.pull-d-7{margin-right:58.3333333333%}.pull-d-8{margin-right:66.6666666667%}.pull-d-9{margin-right:75%}.pull-d-10{margin-right:83.3333333333%}.pull-d-11{margin-right:91.6666666667%}.pull-d-12{margin-right:100%}}@media (max-width: 768px){.col-t-0{width:0%}.col-t-1{width:8.3333333333%}.col-t-2{width:16.6666666667%}.col-t-3{width:25%}.col-t-4{width:33.3333333333%}.col-t-5{width:41.6666666667%}.col-t-6{width:50%}.col-t-7{width:58.3333333333%}.col-t-8{width:66.6666666667%}.col-t-9{width:75%}.col-t-10{width:83.3333333333%}.col-t-11{width:91.6666666667%}.col-t-12{width:100%}.push-t-0{margin-left:0%}.push-t-1{margin-left:8.3333333333%}.push-t-2{margin-left:16.6666666667%}.push-t-3{margin-left:25%}.push-t-4{margin-left:33.3333333333%}.push-t-5{margin-left:41.6666666667%}.push-t-6{margin-left:50%}.push-t-7{margin-left:58.3333333333%}.push-t-8{margin-left:66.6666666667%}.push-t-9{margin-left:75%}.push-t-10{margin-left:83.3333333333%}.push-t-11{margin-left:91.6666666667%}.push-t-12{margin-left:100%}.pull-t-0{margin-right:0%}.pull-t-1{margin-right:8.3333333333%}.pull-t-2{margin-right:16.6666666667%}.pull-t-3{margin-right:25%}.pull-t-4{margin-right:33.3333333333%}.pull-t-5{margin-right:41.6666666667%}.pull-t-6{margin-right:50%}.pull-t-7{margin-right:58.3333333333%}.pull-t-8{margin-right:66.6666666667%}.pull-t-9{margin-right:75%}.pull-t-10{margin-right:83.3333333333%}.pull-t-11{margin-right:91.6666666667%}.pull-t-12{margin-right:100%}}@media (max-width: 576px){.col-m-0{width:0%}.col-m-1{width:8.3333333333%}.col-m-2{width:16.6666666667%}.col-m-3{width:25%}.col-m-4{width:33.3333333333%}.col-m-5{width:41.6666666667%}.col-m-6{width:50%}.col-m-7{width:58.3333333333%}.col-m-8{width:66.6666666667%}.col-m-9{width:75%}.col-m-10{width:83.3333333333%}.col-m-11{width:91.6666666667%}.col-m-12{width:100%}.push-m-0{margin-left:0%}.push-m-1{margin-left:8.3333333333%}.push-m-2{margin-left:16.6666666667%}.push-m-3{margin-left:25%}.push-m-4{margin-left:33.3333333333%}.push-m-5{margin-left:41.6666666667%}.push-m-6{margin-left:50%}.push-m-7{margin-left:58.3333333333%}.push-m-8{margin-left:66.6666666667%}.push-m-9{margin-left:75%}.push-m-10{margin-left:83.3333333333%}.push-m-11{margin-left:91.6666666667%}.push-m-12{margin-left:100%}.pull-m-0{margin-right:0%}.pull-m-1{margin-right:8.3333333333%}.pull-m-2{margin-right:16.6666666667%}.pull-m-3{margin-right:25%}.pull-m-4{margin-right:33.3333333333%}.pull-m-5{margin-right:41.6666666667%}.pull-m-6{margin-right:50%}.pull-m-7{margin-right:58.3333333333%}.pull-m-8{margin-right:66.6666666667%}.pull-m-9{margin-right:75%}.pull-m-10{margin-right:83.3333333333%}.pull-m-11{margin-right:91.6666666667%}.pull-m-12{margin-right:100%}}img[data-action="zoom"]{cursor:pointer;cursor:-webkit-zoom-in;cursor:-moz-zoom-in}.zoom-img,.zoom-img-wrap{position:relative;z-index:666;-webkit-transition:all 300ms;-o-transition:all 300ms;transition:all 300ms}img.zoom-img{cursor:pointer;cursor:-webkit-zoom-out;cursor:-moz-zoom-out}.zoom-overlay{z-index:420;background:#fff;position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;opacity:0;-webkit-transition:opacity 300ms;-o-transition:opacity 300ms;transition:opacity 300ms}.zoom-overlay-open .zoom-overlay{opacity:1}.zoom-overlay-open,.zoom-overlay-transitioning{cursor:default}*,*::after,*::before{box-sizing:border-box}body{font-family:"Roboto",Helvetica Neue,Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;color:#393e46;background-color:#fff;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}body input,body textarea{border:1px solid #e6eef0;outline:none}body input:focus:required:invalid,body textarea:focus:required:invalid{border-color:#e02f40}body input:required:valid,body textarea:required:valid{border-color:#34a74e}::placeholder{color:#666}*::selection{color:#fff;background-color:#393e46}h1,h2,h3,h4,h5,h6{font-family:"Roboto",Helvetica Neue,Helvetica,Arial,sans-serif;line-height:initial;letter-spacing:0.5px}h1{font-size:36px}h2{font-size:28px}h3{font-size:24px}h4{font-size:20px}h5{font-size:18px}h6{font-size:16px}blockquote{margin:30px -100px;font-size:28px;line-height:45px;letter-spacing:0.5px;font-style:normal;text-align:center}@media only screen and (max-width: 768px){blockquote{margin:30px 0;font-size:24px;line-height:38px}}pre{overflow:auto;padding:15px;margin-bottom:0;font-size:14px;white-space:pre-wrap;word-wrap:break-word;word-break:break-all}img,.zoom-img-wrap{max-width:100%;height:auto;vertical-align:middle}img+em,.zoom-img-wrap+em{text-align:center;display:block;font-style:normal;font-weight:normal;font-size:14px;color:#bbb}a{text-decoration:none;color:#f6b141;transition:all 0.35s}a:hover{color:#f49d10}a:active{color:#c87f09}hr{display:block;height:1px;margin:40px 0;border:0;background:#e6eef0}.top{position:fixed;bottom:40px;right:-100px;z-index:1;width:35px;height:35px;text-align:center;line-height:35px;background-color:#393e46;color:#fff;cursor:pointer;transition:all .25s ease}.top.is-active{right:40px}.top:hover{background-color:#000}@media only screen and (max-width: 768px){.top{bottom:25px}.top.is-active{right:30px}.music{bottom:25px}.music.is-active{right:40px}}.music{position:fixed;bottom:40px;z-index:1}.music.is-active{right:40px}.header{position:relative;height:100px}.header .header__overlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:10;background-color:rgba(17,17,17,0.7);cursor:pointer;opacity:0;visibility:hidden;transition:all 0.5s ease}@media only screen and (max-width: 992px){.header .header__overlay.is-visible{opacity:1;visibility:visible}}.logo{position:absolute;top:50%;left:0;transform:translateY(-50%)}.logo .logo__link{font-size:30px;font-weight:700;letter-spacing:0.5px;color:#393e46;text-decoration:none}.logo .logo__link:hover{color:#000}.logo .logo__image{max-height:50px}.main-nav{position:absolute;top:50%;right:5%;transform:translateY(-35%)}.main-nav .nav-icon__close{display:none;font-size:24px;text-align:right;cursor:pointer}.main-nav .nav-icon__close:hover{color:#000}.main-nav .nav__title{display:none}.main-nav .nav__list{white-space:nowrap}.main-nav .nav__list .nav__item{display:inline-block}.main-nav .nav__list .nav__item .nav__link{display:inline-block;padding:10px 30px;font-size:14px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#393e46}.main-nav .nav__list .nav__item .nav__link:hover{color:#000}@media only screen and (max-width: 992px){.main-nav{position:fixed;top:0;left:inherit;right:-300px;bottom:0;transform:none;z-index:100;width:300px;height:100vh;padding:40px 30px 30px;transition:right 0.5s cubic-bezier(0.7, 0.4, 0, 1);background:#fff}.main-nav.is-open{right:0}.main-nav .nav-icon__close{display:block}.main-nav .nav__title{display:block;padding-left:30px;padding-bottom:7px;margin-bottom:10px;color:#bbb;border-bottom:1px solid #e6eef0}.main-nav .nav__list .nav__item{display:block}}.nav-buttons{position:absolute;top:50%;right:0;transform:translateY(-50%);font-size:21px}.nav-buttons .nav__icon{color:#393e46;cursor:pointer}.nav-buttons .nav__icon:hover{color:#000}.nav-buttons .nav__icon-menu{display:none;margin-right:10px}.nav-buttons .nav__icon-menu:hover{color:#000}@media only screen and (max-width: 992px){.nav-buttons .nav__icon-menu{display:inline-block}}.hero{padding:80px 0;margin-bottom:80px;background:#f5f5f5}.hero .last-item{display:flex}.hero .hero__content{display:flex;flex-direction:column;justify-content:center;width:100%;padding:0 40px 0 0}.hero .hero__content .hero__title{font-size:38px;font-weight:normal}.hero .hero__content .hero__subtitle{font-size:18px;line-height:32px;letter-spacing:0.5px}.hero .hero__content .hero__social{display:flex}.hero .hero__content .hero__social-title{font-weight:700}.hero .hero__image img{box-shadow:0 1px 4px rgba(0,0,0,0.15)}@media only screen and (max-width: 992px){.hero .hero__content{padding:0}.hero .hero__content .hero__subtitle{font-size:16px;line-height:28px}}@media only screen and (max-width: 768px){.hero{margin-bottom:40px}.hero .last-item{order:1}.hero .hero__content .hero__title{margin-bottom:20px;font-size:27px}.hero .hero__image{margin-bottom:20px}.hero .hero__image img{box-shadow:none}}@media only screen and (max-width: 576px){.hero{padding:40px 0}}.search{position:fixed;top:0;left:0;right:0;bottom:0;z-index:-1;transform:scale(0.95);opacity:0;background:#fff;transition:all 250ms ease}.search.is-visible{transform:scale(1);z-index:100;opacity:1;transition:all 250ms ease}.search__box{width:50%;margin:0 auto;padding-top:100px}@media only screen and (max-width: 992px){.search__box{width:70%;padding-top:70px}}@media only screen and (max-width: 576px){.search__box{width:100%;padding-top:30px}}.search__group{margin-bottom:50px}.search__group .search__close{margin-bottom:30px;font-size:27px;text-align:right;cursor:pointer}.search__group .search__close:hover{color:#000}.search__group .search__text{width:100%;padding:20px 20px 20px 30px;letter-spacing:0.5px;border-radius:30px;border:1px solid #f8f8f8;color:#393e46;background:#f8f8f8}.search__group .search__text::placeholder{letter-spacing:0.5px;color:rgba(57,62,70,0.7)}.search-results-list{height:65vh;margin:0;padding:0 20px;list-style:decimal;overflow:auto;white-space:normal}.search-results-list .search-results__item{margin-bottom:10px;padding-left:10px;padding-bottom:10px;font-weight:700;border-bottom:1px solid #f5efef}.search-results-list .search-results__item:first-child{padding-top:20px;border-top:1px solid #f5efef}.search-results-list .search-results__link{font-size:18px;font-weight:700;letter-spacing:0.5px;color:#393e46}.search-results-list .search-results__link:hover{color:#000}.search-results-list .search-results__date{font-size:12px;color:#bbb}.search-results-list .no-results{list-style:none;padding:20px 0;font-size:18px;font-weight:700;letter-spacing:0.5px;border-top:1px solid #f5efef;border-bottom:1px solid #f5efef}.contact .contact__list li{margin-left:15px;display:inline-block}.contact .contact__list li a{font-size:18px;color:#bbb}.contact .contact__list li a:hover{color:#393e46}.pagination{margin:20px 0 40px;padding:40px 0;text-align:center}@media only screen and (max-width: 576px){.pagination{margin:0 0 20px}}.pagination__list{display:flex;justify-content:space-between;align-items:center}.pagination__list .next-link,.pagination__list .previous-link,.pagination__list .disabled{display:inline-block;width:140px;height:50px;line-height:50px;font-size:12px;letter-spacing:1px;text-transform:uppercase;transition:all .35s;box-shadow:0 1px 3px 0 rgba(0,0,0,0.15);background:#fff}.pagination__list .next-link,.pagination__list .previous-link{color:#393e46}.pagination__list .next-link:hover,.pagination__list .previous-link:hover{color:#000}.pagination__list .disabled{color:#bbb;cursor:not-allowed}.pagination__list .counter-box a,.pagination__list .counter-box span{padding:0 5px;font-size:15px;color:#393e46}.pagination__list .counter-box .active-link{font-weight:700;font-weight:bold}@media only screen and (max-width: 576px){.pagination__list{flex-direction:column}.pagination__list .next-link,.pagination__list .previous-link,.pagination__list .disabled{margin:10px 0}}.subscribe{width:430px;max-width:100%;margin:0 auto 80px;text-align:center}.subscribe .subscribe__title{margin-bottom:10px;font-size:37px;line-height:57px}.subscribe .subscribe__subtitle{margin-bottom:30px;font-size:17px;line-height:27px}.subscribe .subscribe-form .subscribe-group{margin-bottom:30px}.subscribe .subscribe-form .subscribe__email{width:100%;padding:17px;font-size:16px;text-align:center;outline:none;border:none;border-bottom:3px solid #e6eef0}.subscribe .subscribe-form .subscribe__email::placeholder{font-size:18px;color:#e6eef0}.subscribe .subscribe-form .subscribe__button{width:127px;height:57px;font-size:14px;font-weight:700;letter-spacing:0.5px;border-radius:30px;border:none;background:#e6eef0;cursor:pointer;transition:all .35s}.subscribe .subscribe-form .subscribe__button:hover{color:#fff;background:#393e46}@media only screen and (max-width: 576px){.subscribe{margin:0 auto 40px}.subscribe .subscribe__subtitle{font-size:16px;line-height:26px}}.instagram-box{position:relative;margin:0 0 80px}.instagram-box .istagram-contact{position:absolute;left:50%;top:50%;transform:translate(-50%, -50%);z-index:1;display:block;padding:8px 15px;font-size:14px;letter-spacing:0.5px;border-radius:3px;box-shadow:0 4px 4px 0 rgba(0,0,0,0.15);color:#393e46;background:#fff}.instagram-box .istagram-contact:hover{color:#000}.instagram-box .instagram .instagram-item{width:16.6%;display:inline-block;transition:all .35s}.instagram-box .instagram .instagram-item:hover{opacity:0.9}@media only screen and (max-width: 768px){.instagram-box .instagram .instagram-item{width:33.3%}}@media only screen and (max-width: 576px){.instagram-box{margin:0 0 40px}}.footer{position:relative;padding:80px 0 40px;text-align:center;border-top:1px solid #e6eef0;background:#f5f5f5}.footer .contact{margin-bottom:15px}.footer .copyright a{color:#393e46}.footer .copyright a:hover{color:#f6b141}@media only screen and (max-width: 576px){.footer{padding:40px 0 20px}}.lates-title{position:relative;margin-bottom:80px;font-size:14px;line-height:24px;letter-spacing:1px;text-transform:uppercase;font-weight:normal;text-align:center}.lates-title:after,.lates-title:before{content:"";display:block;position:absolute;top:50%;transform:translateY(-50%);height:1px;background:#e6eef0}.lates-title:after{width:calc(50% - 90px);left:0}.lates-title:before{width:calc(50% - 90px);right:0}@media only screen and (max-width: 768px){.lates-title{margin-bottom:40px}.lates-title:after,.lates-title:before{width:calc(50% - 70px)}}.page-title-box .page-title{font-size:36px;line-height:40px;margin:0}@media only screen and (max-width: 576px){.page-title-box .page-title{font-size:24px;line-height:40px}}.page__head .page-image{background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#e6eef0}.page__head .page-image:after{content:"";display:table;width:100%;min-height:300px;padding-top:50%}.page{margin:20px 165px}.page img{margin:30px 0}@media only screen and (max-width: 768px){.page{margin:40px auto}}.page-box{text-align:center}.page-box .back-arrow a{display:inline-block;margin-left:10px;color:#393e46;font-weight:700}.page-box .back-arrow a:hover{color:#000}.article{margin-bottom:40px}.article .article__wrapper{display:flex;align-items:center}.article .article__image{width:50%;display:block;background-position:center;background-size:cover;background-repeat:no-repeat;background-color:#e6eef0}.article .article__image:hover{opacity:0.9}.article .article__image:after{content:"";display:table;width:100%;padding-bottom:70%}.article .article__content{width:60%;padding:60px;margin-left:-10%;z-index:1;border-radius:3px;background:rgba(255,255,255,0.98);box-shadow:0 1px 4px rgba(0,0,0,0.15)}.article .article__content .article__tag{font-size:14px;text-transform:uppercase}.article .article__content .article__title{margin-bottom:40px;font-size:34px}.article .article__content .article__title a{color:#393e46}.article .article__content .article__title a:hover{color:#000}.article .article__content .article__excerpt{display:none;margin-bottom:20px;font-size:16px;line-height:26px}.article .article__content .article__meta{font-size:14px;line-height:18px;text-transform:uppercase;color:#bbb}.article .article__content .article__footer{display:flex;align-items:center}.article .article__content .article__footer .read-more{margin-left:auto;padding-bottom:5px;font-size:14px;line-height:18px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid transparent;color:#bbb}.article .article__content .article__footer .read-more:hover{color:#393e46;border-color:#f6b141}.article .article-without-image{width:100%;margin-left:auto}@media only screen and (max-width: 768px){.article .article__wrapper{flex-direction:column}.article .article__image{width:100%}.article .article__content{width:90%;padding:20px;margin:-10% 0 0 0}.article .article-without-image{width:90%;margin:0}}@media only screen and (max-width: 576px){.article .article__content .article__title{font-size:27px}}.post-title-box{padding:80px 0;border-top:1px solid #e6eef0}.post-title-box .post-title{margin-bottom:10px;width:500px;max-width:100%;font-size:48px;line-height:70px}.post-title-box .post__date{font-weight:700}@media only screen and (max-width: 576px){.post-title-box{padding:40px 0}.post-title-box .post-title{margin:10px 0;font-size:36px;line-height:53px}}.post__info{display:flex;align-items:center}.post__info .post__author{margin-right:10px;font-weight:700}.post__info .post__author .author-name{color:#bbb;border-bottom:1px solid transparent}.post__info .post__author .author-name:hover{border-bottom:1px solid #bbb}.post__info .post__tags .post__tags-tag{position:relative;padding-left:15px;font-weight:700}.post__info .post__tags .post__tags-tag:before{content:"";position:absolute;top:50%;left:0;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:#393e46}.post-image{background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#e6eef0}.post-image:after{content:"";display:table;width:100%;min-height:300px;padding-top:50%}.post{margin:80px auto}.post.post-no-image{margin:0 auto 80px}@media only screen and (max-width: 576px){.post{margin:40px auto}.post.post-no-image{margin:0 auto 40px}}.post img{margin:30px 0}.post__content{margin-bottom:40px}.post__share{display:flex}.post__share .share__title{margin-right:10px;font-size:18px;font-weight:700;letter-spacing:0.5px}.post__share .share__list .share__item{display:inline-block;margin:0 10px}.post__share .share__list .share__item a{font-size:18px;color:#bbb}.post__share .share__list .share__item a:hover{color:#393e46}.post__navigation{display:flex;align-items:baseline;margin-bottom:80px;padding-bottom:80px;border-bottom:1px solid #e6eef0}.post__navigation .prev,.post__navigation .next{flex:1 0 50%}.post__navigation .prev:last-child,.post__navigation .next:last-child{padding-right:0}.post__navigation .prev .post__nav__image,.post__navigation .next .post__nav__image{display:block;margin-bottom:40px;background-position:center;background-size:cover;background-repeat:no-repeat;background-color:#e6eef0;transition:.35s ease-in-out}.post__navigation .prev .post__nav__image:hover,.post__navigation .next .post__nav__image:hover{opacity:0.9}.post__navigation .prev .post__nav__image:after,.post__navigation .next .post__nav__image:after{content:"";display:table;width:100%;padding-bottom:65%}.post__navigation .prev .post__nav__title,.post__navigation .next .post__nav__title{margin-bottom:20px;font-size:27px;line-height:37px;text-transform:uppercase;letter-spacing:2px;text-align:center}.post__navigation .prev .post__nav__title a,.post__navigation .next .post__nav__title a{display:inline-block;max-width:250px;padding:0 10px;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#393e46}.post__navigation .prev .post__nav__title a:hover,.post__navigation .next .post__nav__title a:hover{color:#000}.post__navigation .prev{padding-right:10px}.post__navigation .next{padding-left:10px}.post__navigation .prev__excerpt,.post__navigation .next__excerpt{width:100%;max-width:400px;margin:0 auto;text-align:center}@media only screen and (max-width: 768px){.post__navigation{flex-wrap:wrap}.post__navigation .prev,.post__navigation .next{flex:1 0 100%;padding:0}.post__navigation .next{margin-top:40px}}@media only screen and (max-width: 576px){.post__navigation{margin-bottom:40px;padding-bottom:40px}.post__navigation .prev .post__nav__image,.post__navigation .next .post__nav__image{margin-bottom:20px}}.tag-cloud{list-style:none;padding:0;text-align:justify;font-size:16px}.tag-cloud li{display:inline-block;margin:0 12px 12px 0}.archive-group{text-align:start;padding:20px;border-top:1px solid #ddd}.archive-item{text-align:start;margin-top:20px}.post-tags{text-align:start}
+ */
+  </style>
+</head>
+
+<body>
+  <div class="container">
+  <div class="row">
+    <div class="col col-12">
+      <!-- begin header -->
+      <header class="header">
+
+        <!-- <div class="logo">
+          <a class="logo__link" href="/">
+          
+            无伤大雅的你呀的个人博客
+          
+          </a>
+        </div> -->
+
+        <nav class="main-nav">
+
+          <div class="main-nav__box">
+            <div class="nav-icon__close">
+              <i class="ion ion-ios-close-circle-outline"></i>
+            </div>
+
+            <div class="nav__title">菜单</div>
+            
+            <ul class="nav__list list-reset">
+              <li class="nav__item">
+                <a href="/" class="nav__link">主页</a>
+              </li>
+              
+                
+              
+                
+              
+              <li class="nav__item">
+                <a href="/about/" class="nav__link">关于</a>
+              </li>
+              
+                
+              
+                
+              
+              <li class="nav__item">
+                <a href="/archives/" class="nav__link">归档</a>
+              </li>
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+              <li class="nav__item">
+                <a href="/tag/" class="nav__link">标签</a>
+              </li>
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </ul>
+
+          </div>
+        </nav>
+
+        <div class="nav-buttons">
+          <i class="nav__icon nav__icon-menu ion ion-md-menu" aria-label="Menu Icon"></i>
+          <i class="nav__icon nav__icon-search ion ion-md-search" aria-label="Search Icon"></i>
+        </div>
+
+        <div class="header__overlay"></div>
+      </header>
+      <!-- end header -->
+    </div>
+  </div>
+</div>
+  <!-- begin content -->
+  <main class="content" aria-label="Content">
+    <!-- //添加评论系统 -->
+<!-- <link rel="stylesheet" href="/js/gitalk.css">
+<script src="/js/gitalk.min.js"></script> -->
+<link rel="stylesheet" href="/js/syntax.css">
+<div class="container">
+  <div class="post-title-box">
+    <div class="row">
+      <div class="col col-10 push-2 col-11 push-t-1 col-m-12 push-m-0">
+        <span class="post__date">
+          <time datetime="2020-07-29T18:21:31+08:00">Jul 29, 2020</time>
+        </span>
+
+        <h1 class="post-title">浅谈Android消息机制</h1>
+
+        <div class="post__info">
+          <div class="post__author">
+            <span>By</span>
+            <a href="/about/" class="author-name">无伤大雅的你呀</a>
+          </div>
+
+          
+          <div class="post__tags">
+            
+              <a href="/tag/#Android" class="post__tags-tag">Android</a>
+            
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+    <div class="post__head">
+      <div class="post-image" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></div>
+    </div>
+  
+
+  </div>
+
+
+  <div class="container">
+  <div class="row">
+    <!-- begin post -->
+    <article class="post  col col-8 col-t-10 col-m-12">
+
+      <div class="post__content">
+        <h2 id="概览">概览</h2>
+
+<p>Android 消息机制用于多线程通信</p>
+
+<h3 id="进程与线程">进程与线程</h3>
+
+<p>既然要讨论的是多线程通信，那么就得知道什么是线程。</p>
+
+<p>说到线程，必须得了解进程是什么。</p>
+
+<blockquote>
+  <p>进程是操作系统对一个正在运行的程序的一种抽象。</p>
+
+  <p>进程运行时所需的所有状态信息称之为上下文。</p>
+
+  <p>进程可以提供俩个关键抽象：独立逻辑控制流，私有地址空间</p>
+
+  <p>摘录自深入理解计算机系统(第三版)</p>
+</blockquote>
+
+<p>线程是运行在进程的上下文中的执行单元，共享全局数据。在现在的大多数主流操作系统中，一个进程由多个线程组成，不可避免的要面对一个问题，怎么运行调度这些线程？这也是文章讨论的主题，Android 世界中的消息机制。</p>
+
+<h3 id="threadlocal">ThreadLocal</h3>
+
+<p>ThreadLocal 用于线程内部的数据存储，学习消息机制之前先了解一下这个前置知识。</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ThreadLocal</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="o">{</span>
+    
+	<span class="kd">static</span> <span class="kd">class</span> <span class="nc">ThreadLocalMap</span> <span class="o">{</span>
+        
+        <span class="kd">private</span> <span class="nc">ThreadLocal</span><span class="o">.</span><span class="na">ThreadLocalMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">[]</span> <span class="n">table</span><span class="o">;</span>
+        
+        <span class="nc">ThreadLocalMap</span><span class="o">(</span><span class="nc">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">var1</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">var2</span><span class="o">)</span> <span class="o">{}</span>
+        
+        <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Entry</span> <span class="kd">extends</span> <span class="nc">WeakReference</span><span class="o">&lt;</span><span class="nc">ThreadLocal</span><span class="o">&lt;?&gt;&gt;</span> <span class="o">{</span>
+            <span class="nc">Object</span> <span class="n">value</span><span class="o">;</span>
+
+            <span class="nc">Entry</span><span class="o">(</span><span class="nc">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">var1</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">var2</span><span class="o">)</span> <span class="o">{</span>
+                <span class="kd">super</span><span class="o">(</span><span class="n">var1</span><span class="o">);</span>
+                <span class="k">this</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">var2</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Thread</span> <span class="kd">implements</span> <span class="nc">Runnable</span> <span class="o">{</span>
+    <span class="nc">ThreadLocalMap</span> <span class="n">threadLocals</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>通过上面的源码，可以看到 Thread 持有 ThreadLocalMap 实例，ThreadLocalMap 是 ThreadLocal 的静态内部类，ThreadLocalMap 中维护着私有变量 Entry 数组，Entry  属于 key-value 的形式，key 为 ThreadLocal 的弱引用。</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ThreadLocal</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="o">{</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="no">T</span> <span class="n">var1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Thread</span> <span class="n">var2</span> <span class="o">=</span> <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+        <span class="nc">ThreadLocal</span><span class="o">.</span><span class="na">ThreadLocalMap</span> <span class="n">var3</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">getMap</span><span class="o">(</span><span class="n">var2</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">var3</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">var3</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">var1</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">createMap</span><span class="o">(</span><span class="n">var2</span><span class="o">,</span> <span class="n">var1</span><span class="o">);</span>
+        <span class="o">}</span>
+
+    <span class="o">}</span>
+    
+    <span class="kt">void</span> <span class="nf">createMap</span><span class="o">(</span><span class="nc">Thread</span> <span class="n">var1</span><span class="o">,</span> <span class="no">T</span> <span class="n">var2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">var1</span><span class="o">.</span><span class="na">threadLocals</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ThreadLocal</span><span class="o">.</span><span class="na">ThreadLocalMap</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">var2</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="no">T</span> <span class="nf">get</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">Thread</span> <span class="n">var1</span> <span class="o">=</span> <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+        <span class="nc">ThreadLocal</span><span class="o">.</span><span class="na">ThreadLocalMap</span> <span class="n">var2</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">getMap</span><span class="o">(</span><span class="n">var1</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">var2</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">ThreadLocal</span><span class="o">.</span><span class="na">ThreadLocalMap</span><span class="o">.</span><span class="na">Entry</span> <span class="n">var3</span> <span class="o">=</span> <span class="n">var2</span><span class="o">.</span><span class="na">getEntry</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">var3</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nc">Object</span> <span class="n">var4</span> <span class="o">=</span> <span class="n">var3</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+                <span class="k">return</span> <span class="n">var4</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">setInitialValue</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="no">T</span> <span class="nf">setInitialValue</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">Object</span> <span class="n">var1</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">initialValue</span><span class="o">();</span>
+        <span class="nc">Thread</span> <span class="n">var2</span> <span class="o">=</span> <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+        <span class="nc">ThreadLocal</span><span class="o">.</span><span class="na">ThreadLocalMap</span> <span class="n">var3</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">getMap</span><span class="o">(</span><span class="n">var2</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">var3</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">var3</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">var1</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">createMap</span><span class="o">(</span><span class="n">var2</span><span class="o">,</span> <span class="n">var1</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">var1</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="kd">protected</span> <span class="no">T</span> <span class="nf">initialValue</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>ThreadLocal 的 set 方法，首先获取当前线程，再获取线程的 ThreadLocalMap，对其进行操作。get 方法也是获取线程 ThreadLocalMap 中对应的值，如果没有初始化，那么会返回 initialValue  方法的值，默认为 null。</p>
+
+<p>那么可以得出的结论是，不同的线程访问同一个 ThreadLocal 的数据是不相同的。</p>
+
+<p>下面我们来看一个示例：</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="k">private</span> <span class="kd">val</span> <span class="py">myBooleanTreadLocal</span> <span class="p">=</span> <span class="nc">ThreadLocal</span><span class="p">&lt;</span><span class="nc">Boolean</span><span class="p">&gt;()</span>
+
+<span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">:</span> <span class="nc">Bundle</span><span class="p">?)</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">.</span><span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">)</span>
+    <span class="nf">setContentView</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">activity_main</span><span class="p">)</span>
+    <span class="n">myBooleanTreadLocal</span><span class="p">.</span><span class="k">set</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+    <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="nc">TAG</span><span class="p">,</span><span class="s">"MainThread myBooleanTreadLocal value : ${myBooleanTreadLocal.get()}"</span><span class="p">)</span>
+    <span class="nc">Thread</span><span class="p">({</span>
+        <span class="n">myBooleanTreadLocal</span><span class="p">.</span><span class="k">set</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>
+        <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="nc">TAG</span><span class="p">,</span><span class="s">"Thread #1 myBooleanTreadLocal value : ${myBooleanTreadLocal.get()}"</span><span class="p">)</span>
+    <span class="p">},</span><span class="s">"Thread #1"</span><span class="p">).</span><span class="nf">start</span><span class="p">()</span>
+
+    <span class="nc">Thread</span><span class="p">({</span>
+        <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="nc">TAG</span><span class="p">,</span><span class="s">"Thread #2 myBooleanTreadLocal value : ${myBooleanTreadLocal.get()}"</span><span class="p">)</span>
+    <span class="p">},</span><span class="s">"Thread #2"</span><span class="p">).</span><span class="nf">start</span><span class="p">()</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>在主线程中创建一个泛型为 Boolean  类型的 ThreadLocal 对象，在 onCreate() 方法中，首先在 Android 主线程将 myBooleanTreadLocal 的值设置为 true，再新建一个匿名线程，将 myBooleanTreadLocal 的值设置为 false，最后再新建一个匿名线程，不对其进行操作。</p>
+
+<p><img src="https://image.wsdydeni.top/ThreadLocalTest.png" alt="" /></p>
+
+<p>结果如上图所示，这就应证了得到的结论是正确的。</p>
+
+<h2 id="创建过程">创建过程</h2>
+
+<p>众所周知，Android 那是有主线程的。</p>
+
+<p>在 Activity 启动流程中，会创建 ActivityTread 对象，这就是应用的主线程。</p>
+
+<p>目光看向 ActivityTread 的 main() 方法：</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+	<span class="nc">Looper</span><span class="o">.</span><span class="na">prepareMainLooper</span><span class="o">();</span>
+	<span class="nc">Looper</span><span class="o">.</span><span class="na">loop</span><span class="o">();</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>其中比较关键的俩行代码，分别调用 Looper 的 prepareMainLooper() 和 Looper.loop() 方法。</p>
+
+<p>so,what is Looper,look look.</p>
+
+<h3 id="looper">Looper</h3>
+
+<p>在 Looper 类源码的最上方，有这么一段注释。</p>
+
+<blockquote>
+  <p>Class used to run a message loop for a thread.</p>
+
+  <p>Threads by default donot have a message loop associated with them;</p>
+
+  <p>to create one, call @link #prepare in the thread that is to run the loop,</p>
+
+  <p>and then @link #loop to have it process messages until the loop is stopped.</p>
+</blockquote>
+
+<p>这是用于创建线程消息循环的类。默认情况下，线程没有与之关联的消息循环；创建一个消息循环，在线程中调用 prepare() 方法，调用 loop() 方法来开始处理消息，直到停止为止。</p>
+
+<p>接下来看一下 Looper 的主要源码部分：</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Looper</span> <span class="o">{</span>
+
+	<span class="kd">static</span> <span class="kd">final</span> <span class="nc">ThreadLocal</span><span class="o">&lt;</span><span class="nc">Looper</span><span class="o">&gt;</span> <span class="n">sThreadLocal</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ThreadLocal</span><span class="o">&lt;</span><span class="nc">Looper</span><span class="o">&gt;();</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">Looper</span> <span class="n">sMainLooper</span><span class="o">;</span>
+	<span class="kd">final</span> <span class="nc">MessageQueue</span> <span class="n">mQueue</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="nc">Thread</span> <span class="n">mThread</span><span class="o">;</span>
+    
+    <span class="kd">private</span> <span class="nf">Looper</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">quitAllowed</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">mQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">MessageQueue</span><span class="o">(</span><span class="n">quitAllowed</span><span class="o">);</span> 
+        <span class="n">mThread</span> <span class="o">=</span> <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+    <span class="o">}</span>
+    
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">prepare</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">quitAllowed</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">sThreadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span> 
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"Only one Looper may be created per thread"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">sThreadLocal</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">new</span> <span class="nc">Looper</span><span class="o">(</span><span class="n">quitAllowed</span><span class="o">));</span> 
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">prepareMainLooper</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">prepare</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="nc">Looper</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">sMainLooper</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="s">"The main Looper has already been prepared."</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="n">sMainLooper</span> <span class="o">=</span> <span class="n">myLooper</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Looper</span> <span class="nf">myLooper</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">sThreadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">();</span> 
+    <span class="o">}</span>
+    
+<span class="o">}</span></code></pre></figure>
+
+<p>首先看向 prepareMainLooper() ，调用了 prepare() 方法。在该方法中，如果当前线程的 ThreadLocal 中的 Looper 对象副本不为空，抛出 RuntimeException ，保证只会初始化一次；接着创建一个 Looper 对象，quitAllowed 标识是能否退出的意思，在 Looper 构造函数中，还初始化了本身的 MessageQueue，最后把 Looper 的变量副本添加自身的 ThreadLocal 中。</p>
+
+<p>prepare() 方法调用完毕后，下方是一个同步代码块，sMainLooper 如果不为空，抛出 IllegalStateException，保证每个线程只允许执行一次，再调用 myLooper() 方法 取出 ThreadLocal 中的 Looper 副本，并设置给 sMainLooper 变量。</p>
+
+<p>上文说过 Android 主线程在初始化过程中调用了 Looper 的 prepareMainLooper() 方法，那么意味着 Android 主线程已经有了当前线程的 Looper 变量的副本。</p>
+
+<p>那么接下来看看 Looper 构造中 MessageQueue 初始化又是怎么一回事。</p>
+
+<h3 id="messagequeue">MessageQueue</h3>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">MessageQueue</span> <span class="o">{</span>
+
+	<span class="kd">private</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">mQuitAllowed</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="kt">long</span> <span class="n">mPtr</span><span class="o">;</span> <span class="c1">// used by native code</span>
+	
+	<span class="kd">private</span> <span class="kd">native</span> <span class="kd">static</span> <span class="kt">long</span> <span class="nf">nativeInit</span><span class="o">();</span>
+
+	<span class="nc">MessageQueue</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">quitAllowed</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">mQuitAllowed</span> <span class="o">=</span> <span class="n">quitAllowed</span><span class="o">;</span>
+        <span class="n">mPtr</span> <span class="o">=</span> <span class="n">nativeInit</span><span class="o">();</span>
+    <span class="o">}</span>
+    
+<span class="o">}</span></code></pre></figure>
+
+<p>在 MessageQueue  的构造函数中，主要是调用一个 native 层方法来对 Native 层 MessageQueue  进行初始化。</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"> <span class="kd">private</span> <span class="kd">native</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">nativeDestroy</span><span class="o">(</span><span class="kt">long</span> <span class="n">ptr</span><span class="o">);</span>
+ <span class="kd">private</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">nativePollOnce</span><span class="o">(</span><span class="kt">long</span> <span class="n">ptr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">timeoutMillis</span><span class="o">);</span>
+ <span class="kd">private</span> <span class="kd">native</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">nativeWake</span><span class="o">(</span><span class="kt">long</span> <span class="n">ptr</span><span class="o">);</span>
+ <span class="kd">private</span> <span class="kd">native</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">nativeIsPolling</span><span class="o">(</span><span class="kt">long</span> <span class="n">ptr</span><span class="o">);</span>
+ <span class="kd">private</span> <span class="kd">native</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">nativeSetFileDescriptorEvents</span><span class="o">(</span><span class="kt">long</span> <span class="n">ptr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fd</span><span class="o">,</span> <span class="kt">int</span> <span class="n">events</span><span class="o">);</span></code></pre></figure>
+
+<p>MessageQueue 中充斥着大量的 native 层方法，可以知道它的本质上是链接 Java 层和 C++ 层的桥梁，主要工作还是 native 层在干活，如果有兴趣了解 natice 层 的 MessageQueue  的内容，可以看一下<a href="http://gityuan.com/2015/12/26/handler-message-framework/">这篇文章</a>。</p>
+
+<hr />
+
+<p>总结一下创建过程，在 Android 主线程中创建了一个不可退出的 Looper ,里面有一个消息循环类 MessageQueue 。</p>
+
+<p>Looper 源码中还有这么一段注释：</p>
+
+<blockquote>
+  <p>Most interaction with a message loop is through the {@link Handler} class.</p>
+</blockquote>
+
+<p>消息循环的大多数交互是通过 Handler 来进行的。</p>
+
+<p>so,what is Handler,look look.</p>
+
+<h2 id="发送消息">发送消息</h2>
+
+<p>Handler 类一段注释如下：</p>
+
+<blockquote>
+  <p>A Handler allows you to send and process {@link Message} and Runnable objects associated with a thread’s {@link MessageQueue}. Each Handler instance is associated with a single thread and that thread’s message queue. When you create a new Handler it is bound to a {@link Looper}. It will deliver messages and runnables to that Looper’s message queue and execute them on that Looper’s thread.</p>
+</blockquote>
+
+<p>大概意思就是，Handler 会和一个线程以及线程中的消息队列相关联，同时会绑定到该线程的 Looper。Handler 能够发送 Message 和 传递 Runnable 到 Looper 的消息队列中，可以在该线程上执行它们。</p>
+
+<h3 id="handler">Handler</h3>
+
+<p>Handler 部分源码如下：</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Handler</span> <span class="o">{</span>
+	<span class="cm">/*
+     * Set this flag to true to detect anonymous, local or member classes
+     * that extend this Handler class and that are not static. These kind
+     * of classes can potentially create leaks.
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="no">FIND_POTENTIAL_LEAKS</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    
+    <span class="kd">final</span> <span class="nc">Looper</span> <span class="n">mLooper</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="nc">MessageQueue</span> <span class="n">mQueue</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="nc">Callback</span> <span class="n">mCallback</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">mAsynchronous</span><span class="o">;</span>
+    
+    <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Callback</span> <span class="o">{</span>
+        <span class="kt">boolean</span> <span class="nf">handleMessage</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">Message</span> <span class="n">msg</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="nf">Handler</span><span class="o">(</span><span class="nd">@Nullable</span> <span class="nc">Callback</span> <span class="n">callback</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">async</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="no">FIND_POTENTIAL_LEAKS</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kd">final</span> <span class="nc">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">Handler</span><span class="o">&gt;</span> <span class="n">klass</span> <span class="o">=</span> <span class="n">getClass</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">((</span><span class="n">klass</span><span class="o">.</span><span class="na">isAnonymousClass</span><span class="o">()</span> <span class="o">||</span> <span class="n">klass</span><span class="o">.</span><span class="na">isMemberClass</span><span class="o">()</span> <span class="o">||</span> <span class="n">klass</span><span class="o">.</span><span class="na">isLocalClass</span><span class="o">())</span> <span class="o">&amp;&amp;</span>
+                    <span class="o">(</span><span class="n">klass</span><span class="o">.</span><span class="na">getModifiers</span><span class="o">()</span> <span class="o">&amp;</span> <span class="nc">Modifier</span><span class="o">.</span><span class="na">STATIC</span><span class="o">)</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nc">Log</span><span class="o">.</span><span class="na">w</span><span class="o">(</span><span class="no">TAG</span><span class="o">,</span> <span class="s">"The following Handler class should be static or leaks might occur: "</span> <span class="o">+</span>
+                    <span class="n">klass</span><span class="o">.</span><span class="na">getCanonicalName</span><span class="o">());</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="n">mLooper</span> <span class="o">=</span> <span class="nc">Looper</span><span class="o">.</span><span class="na">myLooper</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">mLooper</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span>
+                <span class="s">"Can't create handler inside thread "</span> <span class="o">+</span> <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">()</span>
+                        <span class="o">+</span> <span class="s">" that has not called Looper.prepare()"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">mQueue</span> <span class="o">=</span> <span class="n">mLooper</span><span class="o">.</span><span class="na">mQueue</span><span class="o">;</span>
+        <span class="n">mCallback</span> <span class="o">=</span> <span class="n">callback</span><span class="o">;</span>
+        <span class="n">mAsynchronous</span> <span class="o">=</span> <span class="n">async</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>首先看 Handler 的构造函数，Callback 是 Handler 内部声明的接口，async 是否需要异步发送。FIND_POTENTIAL_LEAKS 变量，源码的注释已经写的很清楚了，当该标识设置为 True 时，用于来检测这个 Handlder  是否为成员类、静态类和本地类，以防止内存泄漏的发生。接着获取当前线程的 Looper ,如果为空，抛出 RuntimeException，Hquandler必须运行在已经初始化 Looper 的线程上；再获取  Looper  中的 MessageQueue，如同注释中所说的那样，Handler 与线程的 Looper、MessageQueue 相关联。</p>
+
+<p>下面写一个示例来验证：</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">:</span> <span class="nc">Bundle</span><span class="p">?)</span> <span class="p">{</span>
+        <span class="k">super</span><span class="p">.</span><span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">)</span>
+        <span class="nf">setContentView</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">activity_main</span><span class="p">)</span>
+        <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="nc">TAG</span><span class="p">,</span> <span class="s">"current looper : $mainLooper"</span><span class="p">)</span>
+        <span class="nc">Thread</span><span class="p">({</span>
+            <span class="nc">Looper</span><span class="p">.</span><span class="nf">prepare</span><span class="p">()</span>
+            <span class="kd">val</span> <span class="py">handler</span> <span class="p">=</span> <span class="nc">Handler</span><span class="p">(</span><span class="nc">Looper</span><span class="p">.</span><span class="nf">myLooper</span><span class="p">()</span><span class="o">!!</span><span class="p">)</span>
+            <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="nc">TAG</span><span class="p">,</span><span class="s">"current looper : ${handler.looper}"</span> <span class="p">)</span>
+        <span class="p">},</span><span class="s">"Thread #3"</span><span class="p">).</span><span class="nf">start</span><span class="p">()</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>打印结果如下图所示：</p>
+
+<p><img src="https://image.wsdydeni.top/LooperTest.png" alt="" /></p>
+
+<p>可以看到的是，Handler 是和 Looper 相关联的。</p>
+
+<p>上文中提到 Handler 能够发送 Message 和 传递 Runnable</p>
+
+<p>so,what is Message ,look look.</p>
+
+<h3 id="message">Message</h3>
+
+<p>Message 类的一段注释如下：</p>
+
+<blockquote>
+  <p>Defines a message containing a description and arbitrary data object that can be sent to a {@link Handler}.</p>
+</blockquote>
+
+<p>Message 是任意数据对象和描述的消息载体。</p>
+
+<p>Message 的主要源码字段如下：</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Message</span> <span class="kd">implements</span> <span class="nc">Parcelable</span> <span class="o">{</span>
+
+	<span class="kd">public</span> <span class="kt">int</span> <span class="n">what</span><span class="o">;</span> <span class="c1">// 消息标识</span>
+	
+	<span class="kd">public</span> <span class="kt">int</span> <span class="n">arg1</span><span class="o">;</span> <span class="c1">// 用于存储 int 类型数据</span>
+	<span class="kd">public</span> <span class="kt">int</span> <span class="n">arg2</span><span class="o">;</span>
+	
+	<span class="kd">public</span> <span class="nc">Object</span> <span class="n">obj</span><span class="o">;</span> <span class="c1">// 任意对象数据</span>
+	
+	<span class="kd">public</span> <span class="kt">long</span> <span class="n">when</span><span class="o">;</span> <span class="c1">// 消息触发时间</span>
+	
+	<span class="nc">Bundle</span> <span class="n">data</span><span class="o">;</span> <span class="c1">// Bundle 类型数据</span>
+	<span class="nc">Handler</span> <span class="n">target</span><span class="o">;</span> <span class="c1">// 用于消息处理</span>
+	<span class="nc">Runnable</span> <span class="n">callback</span><span class="o">;</span> <span class="c1">// 回调接口</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>Message 构造函数为空，类似于 Builder 形式，通过设置方法来填充参数。</p>
+
+<p>接下来进入正题，怎么用 Handler 发送 Message 和 传递 Runnable 到 MessageQueue 呢？</p>
+
+<hr />
+
+<h3 id="发送流程">发送流程</h3>
+
+<p>有很多发送消息的方法，最终都会调用 MessageQueue 的 enqueueMessage() 方法。</p>
+
+<p><img src="https://image.wsdydeni.top/Handler%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E8%B0%83%E7%94%A8%E9%93%BE.png" alt="" /></p>
+
+<p>这里选择一条比较长的调用链来做说明。</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Handler</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">Message</span> <span class="nf">getPostMessage</span><span class="o">(</span><span class="nc">Runnable</span> <span class="n">r</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">token</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Message</span> <span class="n">m</span> <span class="o">=</span> <span class="nc">Message</span><span class="o">.</span><span class="na">obtain</span><span class="o">();</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">obj</span> <span class="o">=</span> <span class="n">token</span><span class="o">;</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">callback</span> <span class="o">=</span> <span class="n">r</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+	<span class="kd">public</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="nf">postDelayed</span><span class="o">(</span><span class="nc">Runnable</span> <span class="n">r</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">token</span><span class="o">,</span> <span class="kt">long</span> <span class="n">delayMillis</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">sendMessageDelayed</span><span class="o">(</span><span class="n">getPostMessage</span><span class="o">(</span><span class="n">r</span><span class="o">,</span> <span class="n">token</span><span class="o">),</span> <span class="n">delayMillis</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="nf">sendMessageDelayed</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">Message</span> <span class="n">msg</span><span class="o">,</span> <span class="kt">long</span> <span class="n">delayMillis</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">delayMillis</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">delayMillis</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="nf">sendMessageAtTime</span><span class="o">(</span><span class="n">msg</span><span class="o">,</span> <span class="nc">SystemClock</span><span class="o">.</span><span class="na">uptimeMillis</span><span class="o">()</span> <span class="o">+</span> <span class="n">delayMillis</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">sendMessageAtTime</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">Message</span> <span class="n">msg</span><span class="o">,</span> <span class="kt">long</span> <span class="n">uptimeMillis</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">MessageQueue</span> <span class="n">queue</span> <span class="o">=</span> <span class="n">mQueue</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">queue</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">RuntimeException</span> <span class="n">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RuntimeException</span><span class="o">(</span>
+                    <span class="k">this</span> <span class="o">+</span> <span class="s">" sendMessageAtTime() called with no mQueue"</span><span class="o">);</span>
+            <span class="nc">Log</span><span class="o">.</span><span class="na">w</span><span class="o">(</span><span class="s">"Looper"</span><span class="o">,</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">e</span><span class="o">);</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="nf">enqueueMessage</span><span class="o">(</span><span class="n">queue</span><span class="o">,</span> <span class="n">msg</span><span class="o">,</span> <span class="n">uptimeMillis</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">enqueueMessage</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">MessageQueue</span> <span class="n">queue</span><span class="o">,</span> <span class="nd">@NonNull</span> <span class="nc">Message</span> <span class="n">msg</span><span class="o">,</span>
+            <span class="kt">long</span> <span class="n">uptimeMillis</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">msg</span><span class="o">.</span><span class="na">target</span> <span class="o">=</span> <span class="k">this</span><span class="o">;</span>
+        <span class="n">msg</span><span class="o">.</span><span class="na">workSourceUid</span> <span class="o">=</span> <span class="nc">ThreadLocalWorkSource</span><span class="o">.</span><span class="na">getUid</span><span class="o">();</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">mAsynchronous</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">msg</span><span class="o">.</span><span class="na">setAsynchronous</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">queue</span><span class="o">.</span><span class="na">enqueueMessage</span><span class="o">(</span><span class="n">msg</span><span class="o">,</span> <span class="n">uptimeMillis</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>调用 postDelayed() 方法，首先会将 Runnable 对象包装成 Message，退出消息队列时可以使用 token  调用  removeCallbacksAndMessages() 方法将这个 Message 从消息队列中移出，delayMillis 是当该 Runnable 执行时的延迟时间，单位为毫秒。随后调用 sendMessageDelayed() 方法，这个方法会做一个判断，如果延迟时间小于 0 毫秒，都做 0 毫秒处理，也就是立即执行的消息。接着调用 sendMessageAtTime 方法，如果当前 Handler 没有相关联的 MessageQueue ，那么会抛出 RuntimeException。最后调用 enqueueMessage() 方法，将 Message 的 target 字段 (上文提了 Message 属性)设置为 Handler 自身，最终调用 MessageQueue 的 enqueueMessage() 方法。</p>
+
+<p>下方将目光看向 MessageQueue 的 enqueueMessage() 方法：</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kt">boolean</span> <span class="nf">enqueueMessage</span><span class="o">(</span><span class="nc">Message</span> <span class="n">msg</span><span class="o">,</span> <span class="kt">long</span> <span class="n">when</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">target</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Message must have a target."</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">isInUse</span><span class="o">())</span> <span class="o">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="n">msg</span> <span class="o">+</span> <span class="s">" This message is already in use."</span><span class="o">);</span>
+            <span class="o">}</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">mQuitting</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nc">IllegalStateException</span> <span class="n">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">IllegalStateException</span><span class="o">(</span>
+                        <span class="n">msg</span><span class="o">.</span><span class="na">target</span> <span class="o">+</span> <span class="s">" sending message to a Handler on a dead thread"</span><span class="o">);</span>
+                <span class="nc">Log</span><span class="o">.</span><span class="na">w</span><span class="o">(</span><span class="no">TAG</span><span class="o">,</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">e</span><span class="o">);</span>
+                <span class="n">msg</span><span class="o">.</span><span class="na">recycle</span><span class="o">();</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="n">msg</span><span class="o">.</span><span class="na">markInUse</span><span class="o">();</span>
+            <span class="n">msg</span><span class="o">.</span><span class="na">when</span> <span class="o">=</span> <span class="n">when</span><span class="o">;</span>
+            <span class="nc">Message</span> <span class="n">p</span> <span class="o">=</span> <span class="n">mMessages</span><span class="o">;</span>
+            <span class="kt">boolean</span> <span class="n">needWake</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">when</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">when</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">.</span><span class="na">when</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// New head, wake up the event queue if blocked.</span>
+                <span class="n">msg</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                <span class="n">mMessages</span> <span class="o">=</span> <span class="n">msg</span><span class="o">;</span>
+                <span class="n">needWake</span> <span class="o">=</span> <span class="n">mBlocked</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="c1">// Inserted within the middle of the queue.  Usually we don't have to wake</span>
+                <span class="c1">// up the event queue unless there is a barrier at the head of the queue</span>
+                <span class="c1">// and the message is the earliest asynchronous message in the queue.</span>
+                <span class="n">needWake</span> <span class="o">=</span> <span class="n">mBlocked</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="o">.</span><span class="na">target</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">msg</span><span class="o">.</span><span class="na">isAsynchronous</span><span class="o">();</span>
+                <span class="nc">Message</span> <span class="n">prev</span><span class="o">;</span>
+                <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+                    <span class="n">prev</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">when</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">.</span><span class="na">when</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="k">break</span><span class="o">;</span>
+                    <span class="o">}</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">needWake</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="o">.</span><span class="na">isAsynchronous</span><span class="o">())</span> <span class="o">{</span>
+                        <span class="n">needWake</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+                <span class="n">msg</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span> <span class="c1">// invariant: p == prev.next</span>
+                <span class="n">prev</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">msg</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="c1">// We can assume mPtr != 0 because mQuitting is false.</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">needWake</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">nativeWake</span><span class="o">(</span><span class="n">mPtr</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>首先要进行一些判断，如果 Message 关联的 Handler 为空或者 Message 已经使用、所在的线程正在退出，都会抛出异常。将 Message  标记为已经使用，设置 Message 触发时间为 when。接着取出当前 MessageQueue 的 头消息，如果当前 MessageQueue 为空、加入Message 是立即执行的或者小于当前头部  Message 的触发时间，那么会直接插入到消息链表的头部。不符合上述条件的 Message ，那么会对消息链表进行一个遍历操作，如果后驱结点为空或者后驱结点的触发时间大于要插入的 Message,那么就退出循环，将 Message 插入到消息链表中。</p>
+
+<p>在这个过程中，还有一些需要知道的知识点。</p>
+
+<h4 id="消息池">消息池</h4>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Message</span> <span class="kd">implements</span> <span class="nc">Parcelable</span> <span class="o">{</span>
+    
+    <span class="nc">Message</span> <span class="n">next</span><span class="o">;</span>
+    
+	<span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Object</span> <span class="n">sPoolSync</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Object</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">Message</span> <span class="n">sPool</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">sPoolSize</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">MAX_POOL_SIZE</span> <span class="o">=</span> <span class="mi">50</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="n">gCheckRecycle</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Message</span> <span class="nf">obtain</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="n">sPoolSync</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">sPool</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nc">Message</span> <span class="n">m</span> <span class="o">=</span> <span class="n">sPool</span><span class="o">;</span>
+                <span class="n">sPool</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+                <span class="n">m</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="n">m</span><span class="o">.</span><span class="na">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="c1">// clear in-use flag</span>
+                <span class="n">sPoolSize</span><span class="o">--;</span>
+                <span class="k">return</span> <span class="n">m</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">Message</span><span class="o">();</span>
+    <span class="o">}</span>
+    
+<span class="o">}</span></code></pre></figure>
+
+<p>在上面发送消息的过程中，调用过这个 Message 的 obtain() 方法，如果 sPoolSync 不为空，取出一个 Messsge,并断开消息链表，将 flags 标记置为 0 ，没用使用过的，链表可用长度减 1，返回这个 Messsge；否则的话直接 new 一个 Message 返回。</p>
+
+<p>这样的做法是减少了创建对象的开支，提高了效率。MAX_POOL_SIZE 为消息池的默认长度，通过静态成员变量 sPool 和 成员变量 next 的形式，构建了一个链表，这个链表就是消息池。</p>
+
+<h4 id="时间精度">时间精度</h4>
+
+<p>在 sendMessageAtTime() 方法中，将延时 Message 的触发事件设置为 SystemClock.uptimeMillis() + delayMillis。</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**
+* Returns milliseconds since boot, not counting time spent in deep sleep.
+*
+* @return milliseconds of non-sleep uptime since boot.
+*/</span>
+<span class="nd">@CriticalNative</span>
+<span class="kd">native</span> <span class="kd">public</span> <span class="kd">static</span> <span class="kt">long</span> <span class="nf">uptimeMillis</span><span class="o">();</span></code></pre></figure>
+
+<p>注释的意思是返回自启动以来的毫秒数，不计算深度睡眠所花费的时间。</p>
+
+<h2 id="处理消息">处理消息</h2>
+
+<p>经过上文的铺垫，我们已经知道了 Looper 中维护着一个 MessageQueue ,MessageQueue  维护着一个消息链表，那么我们只需要对消息链表进行遍历，根据消息触发的时间顺序，来处理消息就可以了。</p>
+
+<p>所以，回到开始提到过的 Looper.loop() 方法，去除了一些其他的代码。</p>
+
+<h4 id="looper---loop">Looper -&gt; loop()</h4>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Looper</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">loop</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="nc">Looper</span> <span class="n">me</span> <span class="o">=</span> <span class="n">myLooper</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">me</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"No Looper; Looper.prepare() wasn't called on this thread."</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="kd">final</span> <span class="nc">MessageQueue</span> <span class="n">queue</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="na">mQueue</span><span class="o">;</span>
+
+        <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+            <span class="nc">Message</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="na">next</span><span class="o">();</span> <span class="c1">// might block</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">msg</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">msg</span><span class="o">.</span><span class="na">target</span><span class="o">.</span><span class="na">dispatchMessage</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
+                
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">exception</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">throw</span> <span class="n">exception</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="n">msg</span><span class="o">.</span><span class="na">recycleUnchecked</span><span class="o">();</span>
+        <span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>	</code></pre></figure>
+
+<p>首先会取出当前线程的 Looper 变量副本，如果为空，会抛出 RuntimeException，提示没有调用 Looper.prepare() 方法进行初始化。接着取出  Looper 中的 MessageQueue，也就是消息队列，调用 next() 进行循环遍历遍历，达到条件的 Message 会被返回，调用 Message 自身相关联的 Handler 的 dispatchMessage() 来处理这个消息。</p>
+
+<h5 id="message---recycleunchecked">Message -&gt; recycleUnchecked()</h5>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kt">void</span> <span class="nf">recycleUnchecked</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">flags</span> <span class="o">=</span> <span class="no">FLAG_IN_USE</span><span class="o">;</span>
+    <span class="n">what</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="n">arg1</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="n">arg2</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">replyTo</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">sendingUid</span> <span class="o">=</span> <span class="no">UID_NONE</span><span class="o">;</span>
+    <span class="n">workSourceUid</span> <span class="o">=</span> <span class="no">UID_NONE</span><span class="o">;</span>
+    <span class="n">when</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">callback</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">sPoolSync</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">sPoolSize</span> <span class="o">&lt;</span> <span class="no">MAX_POOL_SIZE</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">next</span> <span class="o">=</span> <span class="n">sPool</span><span class="o">;</span>
+            <span class="n">sPool</span> <span class="o">=</span> <span class="k">this</span><span class="o">;</span>
+            <span class="n">sPoolSize</span><span class="o">++;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>对于不再使用的消息，消息标记为 FLAG_IN_USE ，所有变量重置，消息没有满，小于 MAX_POOL_SIZE ，那么就会加入到消息池中。</p>
+
+<hr />
+
+<p>接着来看 MessageQueue 的 next() 方法干了什么。</p>
+
+<h4 id="messagequeue-----next">MessageQueue  -&gt;  next()</h4>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">MessageQueue</span> <span class="o">{</span>
+	<span class="nc">Message</span> <span class="nf">next</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="kt">long</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">mPtr</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">ptr</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="c1">//当消息循环已经退出，则直接返回</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kt">int</span> <span class="n">pendingIdleHandlerCount</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="c1">// 循环迭代的首次为-1</span>
+        <span class="kt">int</span> <span class="n">nextPollTimeoutMillis</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">nextPollTimeoutMillis</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nc">Binder</span><span class="o">.</span><span class="na">flushPendingCommands</span><span class="o">();</span>
+            <span class="o">}</span>
+			<span class="c1">//阻塞操作，当等待nextPollTimeoutMillis时长，或者消息队列被唤醒，都会返回</span>
+            <span class="n">nativePollOnce</span><span class="o">(</span><span class="n">ptr</span><span class="o">,</span> <span class="n">nextPollTimeoutMillis</span><span class="o">);</span>
+
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+                <span class="kd">final</span> <span class="kt">long</span> <span class="n">now</span> <span class="o">=</span> <span class="nc">SystemClock</span><span class="o">.</span><span class="na">uptimeMillis</span><span class="o">();</span>
+                <span class="nc">Message</span> <span class="n">prevMsg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="nc">Message</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">mMessages</span><span class="o">;</span>
+                <span class="c1">//当消息的Handler为空时，则查询异步消息</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">msg</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">msg</span><span class="o">.</span><span class="na">target</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="c1">//当查询到异步消息，则立刻退出循环</span>
+                    <span class="k">do</span> <span class="o">{</span>
+                        <span class="n">prevMsg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">;</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+                    <span class="o">}</span> <span class="k">while</span> <span class="o">(</span><span class="n">msg</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">msg</span><span class="o">.</span><span class="na">isAsynchronous</span><span class="o">());</span>
+                <span class="o">}</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">msg</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">now</span> <span class="o">&lt;</span> <span class="n">msg</span><span class="o">.</span><span class="na">when</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="c1">//当异步消息触发时间大于当前时间，则设置下一次轮询的超时时长</span>
+                        <span class="n">nextPollTimeoutMillis</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="nc">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">when</span> <span class="o">-</span> <span class="n">now</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">);</span>
+                    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                      	<span class="c1">// 获取一条消息，并返回</span>
+                        <span class="n">mBlocked</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+                        <span class="k">if</span> <span class="o">(</span><span class="n">prevMsg</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="n">prevMsg</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+                        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                            <span class="n">mMessages</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+                        <span class="o">}</span>
+                        <span class="n">msg</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                       	<span class="c1">//设置消息的使用状态，即flags |= FLAG_IN_USE</span>
+                        <span class="n">msg</span><span class="o">.</span><span class="na">markInUse</span><span class="o">();</span>
+                        <span class="k">return</span> <span class="n">msg</span><span class="o">;</span> <span class="c1">//成功地获取MessageQueue中的下一条即将要执行的消息</span>
+                    <span class="o">}</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="c1">//没有消息</span>
+                    <span class="n">nextPollTimeoutMillis</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+                <span class="o">}</span>
+
+                <span class="c1">//消息正在退出，返回null</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">mQuitting</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">dispose</span><span class="o">();</span>
+                    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="o">}</span>
+
+                <span class="c1">//当消息队列为空，或者是消息队列的第一个消息时</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">pendingIdleHandlerCount</span> <span class="o">&lt;</span> <span class="mi">0</span>
+                        <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">mMessages</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">now</span> <span class="o">&lt;</span> <span class="n">mMessages</span><span class="o">.</span><span class="na">when</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="n">pendingIdleHandlerCount</span> <span class="o">=</span> <span class="n">mIdleHandlers</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+                <span class="o">}</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">pendingIdleHandlerCount</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="c1">//没有idle handlers 需要运行，则循环并等待。</span>
+                    <span class="n">mBlocked</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                    <span class="k">continue</span><span class="o">;</span>
+                <span class="o">}</span>
+
+                <span class="k">if</span> <span class="o">(</span><span class="n">mPendingIdleHandlers</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">mPendingIdleHandlers</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">IdleHandler</span><span class="o">[</span><span class="nc">Math</span><span class="o">.</span><span class="na">max</span><span class="o">(</span><span class="n">pendingIdleHandlerCount</span><span class="o">,</span> <span class="mi">4</span><span class="o">)];</span>
+                <span class="o">}</span>
+                <span class="n">mPendingIdleHandlers</span> <span class="o">=</span> <span class="n">mIdleHandlers</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="n">mPendingIdleHandlers</span><span class="o">);</span>
+            <span class="o">}</span>
+
+            <span class="c1">//只有第一次循环时，会运行idle handlers，执行完成后，重置pendingIdleHandlerCount为0.</span>
+            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">pendingIdleHandlerCount</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+                <span class="kd">final</span> <span class="nc">IdleHandler</span> <span class="n">idler</span> <span class="o">=</span> <span class="n">mPendingIdleHandlers</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+                <span class="n">mPendingIdleHandlers</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">//去掉handler的引用</span>
+
+                <span class="kt">boolean</span> <span class="n">keep</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="n">keep</span> <span class="o">=</span> <span class="n">idler</span><span class="o">.</span><span class="na">queueIdle</span><span class="o">();</span> <span class="c1">//idle时执行的方法</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nc">Log</span><span class="o">.</span><span class="na">wtf</span><span class="o">(</span><span class="no">TAG</span><span class="o">,</span> <span class="s">"IdleHandler threw exception"</span><span class="o">,</span> <span class="n">t</span><span class="o">);</span>
+                <span class="o">}</span>
+
+                <span class="k">if</span> <span class="o">(!</span><span class="n">keep</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="n">mIdleHandlers</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">idler</span><span class="o">);</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+
+             <span class="c1">//重置idle handler个数为0，以保证不会再次重复运行</span>
+            <span class="n">pendingIdleHandlerCount</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+            <span class="c1">//当调用一个空闲handler时，一个新message能够被分发，因此无需等待可以直接查询pending message.</span>
+            <span class="n">nextPollTimeoutMillis</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>这里由于涉及到 native 层，所以直接照搬大佬的讲解，其实也是对源码注释的翻译。</p>
+
+<p>直接看中间的一步操作，如果消息时间小于等于当前时间，那么就会从消息队列中取出这条消息返回。这里可以想象的是，并没有严格的按照约定好的时间来严格处理消息，而是只要不在当前时间之前就可以了，这样就会有触发时间不准确的问题。</p>
+
+<h4 id="handler----dispatchmessage">Handler -&gt;  dispatchMessage()</h4>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Handler</span> <span class="o">{</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">dispatchMessage</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">Message</span> <span class="n">msg</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">callback</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">handleCallback</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">mCallback</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">mCallback</span><span class="o">.</span><span class="na">handleMessage</span><span class="o">(</span><span class="n">msg</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="k">return</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+            <span class="n">handleMessage</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>终于到达了消息机制的终点，最后的处理消息。</p>
+
+<p>首先判断如果 message 的 callback 对象不为空，就调用 handleCallback 方法处理。这个 callback 是什么呢？ 就是我们常见的 Runnable 接口, handleCallback 方法其实也就是调用 run 方法。接下来看 handler 自身的 mCallback 是否为空，如果不为空，调用 mCallback 的 handleMessage 来处理消息，其次 handleMessage 返回 true 就是不需要进行下一步处理；最后就是调用自身的 handleMessage 方法来处理。</p>
+
+<p>现在下面举一个例子：</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span class="k">const</span> <span class="kd">val</span> <span class="py">MESSAGE_RUNNABLE_DISPOSE</span> <span class="p">=</span> <span class="mi">1</span> <span class="c1">// Message Runnable 处理 </span>
+<span class="k">const</span> <span class="kd">val</span> <span class="py">HANDLER_CALLBACK_DISPOSE</span> <span class="p">=</span> <span class="mi">2</span> <span class="c1">// Handler Callback 处理</span>
+<span class="k">const</span> <span class="kd">val</span> <span class="py">HANDLER_ITSELF_DISPOSE</span> <span class="p">=</span> <span class="mi">3</span>   <span class="c1">// Handler handleMessage 处理</span>
+
+<span class="k">fun</span> <span class="nf">test</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">val</span> <span class="py">handler</span> <span class="p">=</span> <span class="nc">TestHandler</span><span class="p">(</span><span class="nc">Handler</span><span class="p">.</span><span class="nc">Callback</span> <span class="p">{</span>
+        <span class="k">return</span><span class="nd">@Callback</span> <span class="k">when</span><span class="p">(</span><span class="n">it</span><span class="p">.</span><span class="n">what</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nc">MESSAGE_RUNNABLE_DISPOSE</span> <span class="p">-&gt;</span> <span class="k">throw</span> <span class="nc">IllegalStateException</span><span class="p">(</span><span class="s">"Something that shouldn't happen"</span><span class="p">)</span>
+            <span class="nc">HANDLER_ITSELF_DISPOSE</span> <span class="p">-&gt;</span> <span class="k">false</span>
+            <span class="nc">HANDLER_CALLBACK_DISPOSE</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="s">"TestHandler"</span><span class="p">,</span><span class="s">"Handler CallBack handleMessage : ${it.what}"</span><span class="p">)</span>
+                <span class="k">true</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="p">-&gt;</span> <span class="k">true</span>
+        <span class="p">}</span>
+    <span class="p">})</span>
+    
+    <span class="n">handler</span><span class="p">.</span><span class="nf">sendMessage</span><span class="p">(</span><span class="nc">Message</span><span class="p">().</span><span class="nf">apply</span> <span class="p">{</span> <span class="n">what</span> <span class="p">=</span> <span class="nc">MESSAGE_RUNNABLE_DISPOSE</span> <span class="p">})</span> <span class="c1">// 1</span>
+
+    <span class="n">handler</span><span class="p">.</span><span class="nf">sendMessage</span><span class="p">(</span><span class="nc">Message</span><span class="p">.</span><span class="nf">obtain</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 2</span>
+        <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="s">"TestHandler"</span><span class="p">,</span><span class="s">"Message runnable run"</span><span class="p">)</span>
+    <span class="p">}.</span><span class="nf">apply</span> <span class="p">{</span>
+        <span class="n">what</span> <span class="p">=</span> <span class="nc">MESSAGE_RUNNABLE_DISPOSE</span>
+    <span class="p">})</span>
+
+    <span class="n">handler</span><span class="p">.</span><span class="nf">sendMessage</span><span class="p">(</span><span class="nc">Message</span><span class="p">().</span><span class="nf">apply</span> <span class="p">{</span> <span class="n">what</span> <span class="p">=</span> <span class="nc">HANDLER_CALLBACK_DISPOSE</span> <span class="p">})</span> <span class="c1">// 3</span>
+
+    <span class="n">handler</span><span class="p">.</span><span class="nf">sendMessage</span><span class="p">(</span><span class="nc">Message</span><span class="p">().</span><span class="nf">apply</span> <span class="p">{</span> <span class="n">what</span> <span class="p">=</span> <span class="nc">HANDLER_ITSELF_DISPOSE</span> <span class="p">})</span> <span class="c1">// 4</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">TestHandler</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="nc">Callback</span><span class="p">)</span> <span class="p">:</span> <span class="nc">Handler</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">handleMessage</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nc">Message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">super</span><span class="p">.</span><span class="nf">handleMessage</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="nc">Log</span><span class="p">.</span><span class="nf">e</span><span class="p">(</span><span class="s">"TestHandler"</span><span class="p">,</span><span class="s">"Handler handleMessage : ${msg.what}"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>在这里给 Message 搞了三个消息类型，也就是 what 变量。继承重写 Handler 的 handleMessage 方法，再声明一个带有 Handler Callback 的对象来处理不同的消息。在第一处，消息类型为 <code class="language-plaintext highlighter-rouge">MESSAGE_RUNNABLE_DISPOSE</code> ，而这个 Message 并没有实现 Runnable，根据上文中处理消息的逻辑，Message 自身的 callback 为空时，会判断 handler 对象是有 mCallback 对象，这里传入了一个 Callback，如果消息类型为 <code class="language-plaintext highlighter-rouge">MESSAGE_RUNNABLE_DISPOSE</code> 会抛出一个异常，因为这不是我们期望的结果，它应该被自身实现的 Runnable 接口所消费了；第二处，这里通过 Message 的 obtain 方法为这个 Message 实现了 Runnable 接口，同时消息的类型为 <code class="language-plaintext highlighter-rouge">MESSAGE_RUNNABLE_DISPOSE</code>,这里会预期的打印出 <code class="language-plaintext highlighter-rouge">"Message runnable run"</code>；第三处，发送了一个类型为 <code class="language-plaintext highlighter-rouge">HANDLER_CALLBACK_DISPOSE</code> 的 Message，此时 Message 没有实现 Runnable 接口，所以会预期的打印出 <code class="language-plaintext highlighter-rouge">Handler CallBack handleMessage : 2</code>,同时返回 true，不希望进行下一步处理，那么这里暂时改成 false 呢？那么还会打印出<code class="language-plaintext highlighter-rouge">"Handler handleMessage : 3"</code>；第四处也是一样的。现在，消息处理的优先级就不难理解了。</p>
+
+<hr />
+
+<p>到这里，消息机制就差不多了，芜湖~</p>
+
+<h2 id="常见问题">常见问题</h2>
+
+<p>子线程中调用 Looper.prepare()、Looper.loop() 后可以使用 Toast</p>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="cm">/**
+ * Make a standard toast to display using the specified looper.
+ * If looper is null, Looper.myLooper() is used.
+ * @hide
+ */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="nc">Toast</span> <span class="nf">makeText</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">Context</span> <span class="n">context</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="nc">Looper</span> <span class="n">looper</span><span class="o">,</span>
+        <span class="nd">@NonNull</span> <span class="nc">CharSequence</span> <span class="n">text</span><span class="o">,</span> <span class="nd">@Duration</span> <span class="kt">int</span> <span class="n">duration</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Toast</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Toast</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">looper</span><span class="o">);</span>
+
+    <span class="nc">LayoutInflater</span> <span class="n">inflate</span> <span class="o">=</span> <span class="o">(</span><span class="nc">LayoutInflater</span><span class="o">)</span>
+            <span class="n">context</span><span class="o">.</span><span class="na">getSystemService</span><span class="o">(</span><span class="nc">Context</span><span class="o">.</span><span class="na">LAYOUT_INFLATER_SERVICE</span><span class="o">);</span>
+    <span class="nc">View</span> <span class="n">v</span> <span class="o">=</span> <span class="n">inflate</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="n">com</span><span class="o">.</span><span class="na">android</span><span class="o">.</span><span class="na">internal</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">transient_notification</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="nc">TextView</span> <span class="n">tv</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TextView</span><span class="o">)</span><span class="n">v</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">com</span><span class="o">.</span><span class="na">android</span><span class="o">.</span><span class="na">internal</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">message</span><span class="o">);</span>
+    <span class="n">tv</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">text</span><span class="o">);</span>
+
+    <span class="n">result</span><span class="o">.</span><span class="na">mNextView</span> <span class="o">=</span> <span class="n">v</span><span class="o">;</span>
+    <span class="n">result</span><span class="o">.</span><span class="na">mDuration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">;</span>
+
+    <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>源码的注释说的非常清楚，默认会获取当前线程 TSL 中的 Looper。</p>
+
+<p>所以只要在子线程中初始化 Looper ，就可以使用 Toast。</p>
+
+<h2 id="感谢">感谢</h2>
+
+<p><a href="http://gityuan.com/2015/12/26/handler-message-framework/">Android消息机制1-Handler(Java层)</a></p>
+
+<p><a href="http://gityuan.com/2015/12/27/handler-message-native/">Android消息机制2-Handler(Native层)</a></p>
+
+
+      </div>
+      <!-- <div class="post__share">
+        <span class="share__title">Share this article:</span>
+        <ul class="share__list list-reset">
+          <li class="share__item">
+            <a class="share__facebook" href="https://www.facebook.com/sharer/sharer.php?u=/2020/07/29/android-handler-details/"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+              title="Share on Facebook" rel="nofollow"><i class="ion ion-logo-facebook"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__twitter" href="https://twitter.com/intent/tweet?text=%E6%B5%85%E8%B0%88Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6&url=/2020/07/29/android-handler-details/"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+              title="Share on Twitter" rel="nofollow"><i class="ion ion-logo-twitter"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=/2020/07/29/android-handler-details/&title=%E6%B5%85%E8%B0%88Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6&summary=&source="
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn" rel="nofollow"><i class="ion ion-logo-linkedin"></i></a>
+          </li>
+
+          <li class="share__item">
+            <a class="share__pinterest" href="http://pinterest.com/pin/create/button/?url=/2020/07/29/android-handler-details/&amp;media=/images/https://image.wsdydeni.top/orange.jpg&amp;description=%E6%B5%85%E8%B0%88Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6"
+              onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Pinterest"
+              rel="nofollow"><i class="ion ion-logo-pinterest"></i></a>
+          </li>
+        </ul>
+      </div> -->
+    </article>
+    <!-- end post -->
+    </div>
+  </div>
+
+  <div class="container">
+  <div class="post__navigation">
+    
+    <div class="prev">
+      <a class="post__nav__image" href="/2020/07/25/analysis-of-android-fingerprint-recognition/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)"></a>
+      <h2 class="post__nav__title">
+        <i class="ion ion-md-arrow-back"></i>
+        <a href="/2020/07/25/analysis-of-android-fingerprint-recognition/">Android指纹识别浅析</a>
+      </h2>
+      <!-- <p class="prev__excerpt">
+        
+          指纹识别相信到现在 大家已经不陌生了 项目地址
+
+越来越多的应用支持指纹功能，心里痒痒，所以也整一个~
+
+做之前想了一会的流程图
+
+
+
+流程思路启发于支付宝
+
+登陆界面判断是否开启 指纹登录进入主界面可设置是否开启...
+        
+      </p> -->
+    </div>
+    
+
+    
+    <div class="next">
+      <a class="post__nav__image" href="/2021/03/02/nested-scrolling-problem/" style="background-image: url(https://image.wsdydeni.top/orange.jpg)">
+      </a>
+      <h2 class="post__nav__title">
+        <a href="/2021/03/02/nested-scrolling-problem/">RecyclerView正确使用姿势</a>
+        <i class="ion ion-md-arrow-forward"></i>
+      </h2>
+      <!-- <p class="next__excerpt">
+        
+          {% highlight markdown %}
+> 原文地址： [Nested recycler in Android done right!](https://medium.com/nerd-for-tech/...
+        
+      </p> -->
+    </div>
+    
+  </div>
+
+  <!--  -->
+  
+  <!--   gitalk       -->
+
+  <div class="comment">
+    <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+    var gitalk = new Gitalk({
+        id: '浅谈Android消息机制',
+        clientID: '5ba623a6d85f6c769ba1',
+        clientSecret: 'b5a11d32fa5613e027d9463a19c49e1f0813a079',
+        repo: 'wsdydeni.github.io',
+        owner: 'wsdydeni',
+        admin: ['wsdydeni'], 
+      labels: ['Gitalk'],
+    })
+    gitalk.render('gitalk-container')
+    </script> 
+  </div>
+
+</div>
+
+  </main>
+  <!-- end content -->
+  <div class="top ion ion-ios-arrow-up" title="Top">
+             
+  </div>
+
+  <!-- begin search -->
+<div class="search">
+  <div class="container">
+    <div class="row">
+      <div class="col col-12">
+        <div class="search__box">
+          <div class="search__group">
+            <div class="search__close">
+              <i class="ion ion-ios-close-circle-outline"></i>
+            </div>
+            <label for="js-search-input" class="screen-reader-text"></label>
+            <input type="text" id="js-search-input" class="search__text" autocomplete="off" placeholder="输入要搜索的内容">
+          </div>
+          <ul id="js-results-container" class="search-results-list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end search -->
+
+  <!-- begin footer -->
+<footer class="footer">
+  <div class="container">
+
+    <!--   -->
+
+    <!--   -->
+
+    <div class="contact">
+  <ul class="contact__list list-reset">
+    
+      <li>
+        <a href="https://juejin.cn/user/1521379824381357/posts" target="_blank">
+          <!-- <i class="ion ion-logo-twitter"></i> -->
+          <img src="/images/juejin.svg">
+        </a>
+      </li>
+    
+
+    
+      <li>
+        <a href="weixin://profile/gh_a9ab84416a7a">
+        <!-- <i class="ion ion-logo-facebook"></i> -->
+          <img src="/images/wechat.svg">
+        </a>
+      </li>
+    
+  
+    
+      <li>
+        <a href="mailto:wsdyeniya@qq.com" target="_blank">
+        <!-- <i class="ion ion-logo-dribbble"></i> -->
+          <img src="/images/mail.svg">
+        </a>
+      </li>
+    
+  
+    
+      <li>
+        <a href="https://github.com/wsdydeni" target="_blank">
+          <img src="/images/git.svg">
+        </a>
+      </li>
+    
+  
+    <!--   -->
+  </ul>
+</div>
+
+    <div class="copyright">Copyright &copy; 2021 <a href="/">无伤大雅的你呀的个人博客</a> — All right Reserved. Powered by <a href="https://jekyllrb.com/">Jekyll</a>.</div>
+</div>
+</footer>
+<!-- end footer -->
+
+
+  <script src="/js/vendors/jquery-3.3.1.min.js"></script>
+<script src="/js/vendors/simple-jekyll-search.min.js"></script>
+<script>
+  SimpleJekyllSearch({
+    searchInput: document.getElementById("js-search-input"),
+    resultsContainer: document.getElementById("js-results-container"),
+    json: "/search.json",
+    searchResultTemplate: '<li class="search-results__item"><a class="search-results__link" href="{url}">{title}</a><br> <span class="search-results__date">{date}</span></li>',
+    noResultsText: '<li class="no-results">No results found</li>'
+  });
+</script>
+<script src="/js/vendors/transition.js"></script>
+<script src="/js/vendors/zoom.min.js"></script>
+<script src="/js/vendors/instafeed.min.js"></script>
+<script src="/js/vendors/jquery.fitvids.js"></script>
+<script src="/js/common.js"></script>
+
+</body>
+
+</html>

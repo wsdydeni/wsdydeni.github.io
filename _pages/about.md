@@ -2,7 +2,7 @@
 layout: page
 title: 关于
 permalink: /about/
-image: owl.jpg
+image: https://image.wsdydeni.top/owl.jpg
 ---
 
 我是无伤大雅的你呀，个人全栈开发工程师。

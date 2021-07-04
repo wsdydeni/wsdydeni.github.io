@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>/2020/07/19/android-custom-view-slider-verification-code/</loc>
+<lastmod>2020-07-19T22:01:03+08:00</lastmod>
+</url>
+<url>
+<loc>/2020/07/25/analysis-of-android-fingerprint-recognition/</loc>
+<lastmod>2020-07-25T18:16:00+08:00</lastmod>
+</url>
+<url>
+<loc>/2020/07/29/android-handler-details/</loc>
+<lastmod>2020-07-29T18:21:31+08:00</lastmod>
+</url>
+<url>
+<loc>/2021/03/02/nested-scrolling-problem/</loc>
+<lastmod>2021-03-02T05:27:36+08:00</lastmod>
+</url>
+<url>
+<loc>/2021/03/03/nested-srcolling-problem2/</loc>
+<lastmod>2021-03-03T05:24:53+08:00</lastmod>
+</url>
+<url>
 <loc>/2021/07/02/windows-builds-Jekyll-blog/</loc>
 <lastmod>2021-07-02T21:52:23+08:00</lastmod>
 </url>
@@ -15,5 +35,8 @@
 </url>
 <url>
 <loc>/tag/</loc>
+</url>
+<url>
+<loc>/page/2/</loc>
 </url>
 </urlset>
