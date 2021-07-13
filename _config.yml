@@ -46,3 +46,5 @@ gitalk:
   clientID: 5ba623a6d85f6c769ba1
   clientSecret: b5a11d32fa5613e027d9463a19c49e1f0813a079
   admin: wsdydeni
+
+theme: jekyll-theme-leap-day
